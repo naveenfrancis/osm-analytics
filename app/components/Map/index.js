@@ -64,12 +64,13 @@ class Map extends Component {
       //glStyle.sources['osm-buildings-aggregated'].tiles[0] = glStyle.sources['osm-buildings-aggregated'].tiles[0].replace('52.50.120.37', 'localhost')
       //glStyle.sources['osm-buildings-raw'].tiles[0] = glStyle.sources['osm-buildings-raw'].tiles[0].replace('52.50.120.37', 'localhost')
     }
-    const { theme } = this.props
+    const { theme, embed } = this.props
 
     map = L.map(
       'map', {
       editable: true,
-      minZoom: 2
+      minZoom: 2,
+      scrollWheelZoom: !embed
     })
     .setView([0, 35], 2)
     map.zoomControl.setPosition('bottomright')
