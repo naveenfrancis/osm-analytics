@@ -21,7 +21,7 @@ const pois = {
 
 const waterways = {
   aggregatedFill: '#c89ab7',
-  hightlightFill: '#5CBAD8'
+  highlightFill: '#5CBAD8'
 }
 
 export default {
