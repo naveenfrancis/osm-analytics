@@ -38,7 +38,7 @@ function fetch(region, filter, time /*optional*/, callback) {
 }
 
 function getRegionZoom(region) {
-  const maxZoom = 14 // todo: setting "maxZoom"
+  const maxZoom = 13 // todo: setting "maxZoom"
   const tileLimit = 12 // todo: setting "tileLimit"
   const regionBounds = extent(region)
   for (let z=maxZoom; z>0; z--) {
