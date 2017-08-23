@@ -8,7 +8,7 @@
         "{{server}}/buildings/{z}/{x}/{y}.pbf"
       ],
       "minzoom": 13,
-      "maxzoom": 14
+      "maxzoom": 13
     },
     "osm-buildings-aggregated": {
       "type": "vector",
