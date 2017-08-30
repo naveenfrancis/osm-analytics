@@ -61,6 +61,7 @@
     "vega": "^2.5.2",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1",
-    "webpack-hot-middleware": "^2.7.1"
+    "webpack-hot-middleware": "^2.7.1",
+    "xml-parse": "^0.3.0"
   }
 }

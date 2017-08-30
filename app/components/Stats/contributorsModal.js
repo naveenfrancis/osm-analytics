@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Modal from 'react-modal'
 import * as request from 'superagent'
 import { queue } from 'd3-queue'
+import { parse, DOM } from 'xml-parse'
 
 class ContributorsModal extends Component {
   state = {
@@ -57,7 +58,7 @@ class ContributorsModal extends Component {
     var uidsToRequest = uids.filter(uid => !this.userNames[uid])
 
     uidsToRequest.forEach(uid => {
-      let req = request.get('http://whosthat.osmz.ru/whosthat.php?action=last&id='+uid)
+      let req = request.get('//api.openstreetmap.org/api/0.6/user/'+uid)
       q.defer(req.end.bind(req))
     })
     q.awaitAll(function(err, data) {
@@ -65,7 +66,9 @@ class ContributorsModal extends Component {
         console.error(err)
       } else {
         uidsToRequest.forEach((uid, idx) => {
-          this.userNames[uid] = data[idx].body[0]
+          const xmlDOM = new DOM(parse(data[idx].text));
+          const user = xmlDOM.document.getElementsByTagName('user')[0];
+          this.userNames[uid] = user.attributes.display_name;
         })
       }
       this.setState({ loading: false })
