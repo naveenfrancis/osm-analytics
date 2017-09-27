@@ -67,11 +67,20 @@ function getRegionTiles(region, zoom) {
     }
   }
   // drop tiles that are actually outside the region
-  tiles = tiles.filter(tile =>
-    intersect(
-      bboxPolygon(merc.bbox(tile.x, tile.y, tile.zoom)),
-      region
-    ) !== undefined
+
+  tiles = tiles.filter(tile => {
+
+    const bboxPoly = bboxPolygon(merc.bbox(tile.x, tile.y, tile.zoom))
+    try {
+      return intersect(
+        bboxPoly,
+        region
+      )
+    } catch(e) {
+      console.warn(e)
+      return true
+    }
+  }
   )
   return tiles
 }
