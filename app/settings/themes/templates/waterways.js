@@ -22,7 +22,7 @@ export default ({ aggregatedFill, highlightFill }) => [
       'fill-antialias': false,
       'fill-opacity': {
         base: 1,
-        stops: [[10, 0.1], [13, 1.0]]
+        stops: [[10, 0.3], [13, 1.0]]
       }
     }
   },
@@ -33,7 +33,7 @@ export default ({ aggregatedFill, highlightFill }) => [
       'fill-antialias': false,
       'fill-opacity': {
         base: 1,
-        stops: [[8, 0.1], [11, 1.0], [12, 1.0]]
+        stops: [[8, 0.3], [11, 1.0], [12, 1.0]]
       }
     }
   },
@@ -44,7 +44,7 @@ export default ({ aggregatedFill, highlightFill }) => [
       'fill-antialias': false,
       'fill-opacity': {
         base: 1,
-        stops: [[6, 0.1], [9, 1.0], [12, 1.0]]
+        stops: [[6, 0.3], [9, 1.0], [12, 1.0]]
       }
     }
   },
@@ -55,7 +55,7 @@ export default ({ aggregatedFill, highlightFill }) => [
       'fill-antialias': false,
       'fill-opacity': {
         base: 1,
-        stops: [[4, 0.1], [7, 1.0], [12, 1.0]]
+        stops: [[4, 0.3], [7, 1.0], [12, 1.0]]
       }
     }
   },
@@ -66,7 +66,7 @@ export default ({ aggregatedFill, highlightFill }) => [
       'fill-antialias': false,
       'fill-opacity': {
         base: 1,
-        stops: [[2, 0.1], [5, 1.0], [12, 1.0]]
+        stops: [[2, 0.3], [5, 1.0], [12, 1.0]]
       }
     }
   },
@@ -77,7 +77,7 @@ export default ({ aggregatedFill, highlightFill }) => [
       'fill-antialias': false,
       'fill-opacity': {
         base: 1,
-        stops: [[0, 0.1], [3, 1.0], [12, 1.0]]
+        stops: [[0, 0.3], [3, 1.0], [12, 1.0]]
       }
     }
   },
