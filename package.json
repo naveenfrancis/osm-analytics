@@ -14,7 +14,7 @@
     "url": "git+https://github.com/GFDRR/osm-analytics.git"
   },
   "license": "BSD-3-Clause",
-  "devDependencies": {
+  "dependencies": {
     "babel-core": "^6.10.4",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^6.2.3",
