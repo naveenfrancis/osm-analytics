@@ -9,6 +9,10 @@
     "build": "NODE_ENV=production webpack --progress --colors",
     "lint": "eslint -c .eslintrc.js --ext .jsx,.js app"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GFDRR/osm-analytics.git"
+  },
   "license": "BSD-3-Clause",
   "devDependencies": {
     "babel-core": "^6.10.4",
