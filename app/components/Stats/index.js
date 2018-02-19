@@ -150,7 +150,11 @@ class Stats extends Component {
             }</span><br/><span className="descriptor">Contributors</span>
           </li>
         </ul>
-        <button className="compare-toggle" onClick={::this.enableCompareView}>Compare Time Periods</button>
+
+	<div className="buttons">
+          <button className="compare-toggle" onClick={::this.enableCompareView}>Compare Time Periods</button>
+          <a href="#"><button className="close">Close</button></a>
+        </div>
 
         <Modal
           isOpen={this.state.hotProjectsModalOpen}
@@ -230,7 +234,6 @@ class Stats extends Component {
   enableCompareView() {
     this.props.actions.setView('compare')
   }
-
 }
 
 

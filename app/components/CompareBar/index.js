@@ -72,7 +72,9 @@ class CompareBar extends Component {
         </li>
         </ul>
 
-        <button className="compare-toggle" onClick={::this.disableCompareView}>Close Comparison View</button>
+        <div className="buttons">
+          <button className="compare-toggle" onClick={::this.disableCompareView}>Close Comparison View</button>
+        </div>
 
         <Chart before={this.props.map.times[0]} after={this.props.map.times[1]} data={this.state.featureCounts}/>
       </div>
