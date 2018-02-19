@@ -1,7 +1,7 @@
 {
   "name": "osm-analytics",
   "version": "0.1.0",
-  "description": "OSM data analysis toll, user interface",
+  "description": "OSM data analysis tool, user interface",
   "main": "index.js",
   "scripts": {
     "test": "npm run lint",
