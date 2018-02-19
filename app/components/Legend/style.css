@@ -8,16 +8,21 @@
   list-style-type: none;
   background-color: rgba(#fff, 0.6);
   border-radius: 4px;
+  pointer-events: none;
 
   li {
     display: block;
     line-height: 18px;
     font-size: 12px;
     h3 {
+      display: inline-block;
       margin: 0;
       font-size: 14px;
       line-height: 22px;
       margin-bottom: 6px;
+    }
+    h3, span {
+      pointer-events: all;
     }
     &:last-child {
       margin-top: 6px;
