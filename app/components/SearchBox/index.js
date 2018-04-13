@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import * as request from 'superagent'
 import superagentPromisePlugin from 'superagent-promise-plugin'
-import osmtogeojson from 'osmtogeojson'
 import { simplify, polygon } from 'turf'
 import Fuse from 'fuse.js'
 import Autosuggest from 'react-autosuggest'
@@ -81,24 +80,19 @@ class SearchBox extends Component {
     .get('https://nominatim.openstreetmap.org/search')
     .query({
       format: 'json',
+      polygon_geojson: 1,
       q: where
     })
     .use(superagentPromisePlugin)
     .then(function(res) {
       var hits = res.body.filter(r => r.osm_type !== 'node')
       if (hits.length === 0) throw new Error('nothing found for place name '+where)
-      return request
-      .get('https://overpass-api.de/api/interpreter')
-      .query({
-        data: '[out:json][timeout:3];'+hits[0].osm_type+'('+hits[0].osm_id+');out geom;'
-      })
-      .use(superagentPromisePlugin)
+      return hits[0].geojson
     })
-    .then(function(res) {
-      var osmFeature = osmtogeojson(res.body).features[0]
-      if (!(osmFeature.geometry.type === 'Polygon' || osmFeature.geometry.type === 'MultiPolygon')) throw new Error('invalid geometry')
-      var coords = osmFeature.geometry.coordinates
-      if (osmFeature.geometry.type === 'MultiPolygon') {
+    .then(function(geojson) {
+      if (!(geojson.type === 'Polygon' || geojson.type === 'MultiPolygon')) throw new Error('invalid geometry')
+      var coords = geojson.coordinates
+      if (geojson.type === 'MultiPolygon') {
         coords = coords.sort((p1,p2) => p2[0].length - p1[0].length)[0] // choose polygon with the longest outer ring
       }
       coords = coords[0]
