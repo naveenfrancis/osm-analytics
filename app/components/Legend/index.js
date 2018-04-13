@@ -51,11 +51,6 @@ class Legend extends Component {
           Area with mostly highlighted {featureTypeDescription.toLowerCase()}</li>)
       }
     }
-    if (this.props.hotOverlayEnabled) {
-      legendEntries.push(
-        <li><span className={'legend-icon hot-projects'}></span>HOT project outline</li>
-      )
-    }
     return (
       <ul id="legend" style={themes[theme].legend}>
         <li><h3>Map Legend</h3></li>

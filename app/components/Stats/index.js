@@ -9,9 +9,9 @@ import * as MapActions from '../../actions/map'
 import * as StatsActions from '../../actions/stats'
 import OverlayButton from '../OverlayButton'
 import UnitSelector from '../UnitSelector'
-import HotOverlaySelector from '../HotOverlaySelector'
 import Histogram from './chart'
 import ContributorsModal from './contributorsModal'
+import HotProjectsModal from './hotProjectsModal'
 import regionToCoords from '../Map/regionToCoords'
 import searchHotProjectsInRegion from './searchHotProjects'
 import searchFeatures from './searchFeatures'
@@ -136,12 +136,7 @@ class Stats extends Component {
             <span className="number">{this.state.hotProjects.length > 0
             ? <a className="link" onClick={::this.openHotModal} target="_blank">{this.state.hotProjects.length}</a>
             : this.state.hotProjects.length
-            }</span><br/>
-            <HotOverlaySelector
-              hotOverlayEnabled={this.props.map.hotOverlay}
-              enableHotOverlay={this.props.actions.enableHotOverlay}
-              disableHotOverlay={this.props.actions.disableHotOverlay}
-            />
+            }</span><br/><span className="descriptor">HOT Projects</span>
           </li>
           <li>
             <span className="number">{!numContributors
@@ -151,23 +146,17 @@ class Stats extends Component {
           </li>
         </ul>
 
-	<div className="buttons">
+        <div className="buttons">
           <button className="compare-toggle" onClick={::this.enableCompareView}>Compare Time Periods</button>
           <a href="#"><button className="close">Close</button></a>
         </div>
 
-        <Modal
+        <HotProjectsModal
           isOpen={this.state.hotProjectsModalOpen}
           onRequestClose={::this.closeHotModal}
-          style={modalStyles}>
-          <h3>HOT Projects</h3>
-          <a className="close-link" onClick={::this.closeHotModal}>x</a>
-          <ul className="hot-projects">
-          {this.state.hotProjects.map(p =>
-            <li key={p.id}><a className="link" href={"http://tasks.hotosm.org/project/"+p.id}>{'#'+p.id+' '+p.properties.name}</a></li>
-          )}
-          </ul>
-        </Modal>
+          style={modalStyles}
+          hotProjects={this.state.hotProjects}
+        />
         <ContributorsModal
           isOpen={this.state.contributorsModalOpen}
           onRequestClose={::this.closeContributorsModal}
@@ -197,24 +186,26 @@ class Stats extends Component {
   }
 
   update(region, filters) {
-    region = polygon(regionToCoords(region))
-    this.setState({ updating: true, features: [] })
-    var q = queue()
-    filters.forEach(filter =>
-      q.defer(searchFeatures, region, filter)
-    )
-    q.awaitAll(function(err, data) {
-      if (err) throw err
-      this.setState({
-        features: data.map((d,index) => ({
-          filter: filters[index],
-          features: d.features
-        })),
-        updating: false
-      })
-    }.bind(this))
-    const hotProjects = searchHotProjectsInRegion(region)
-    this.setState({ hotProjects })
+    regionToCoords(region)
+    .then((function(region) {
+      this.setState({ updating: true, features: [] })
+      var q = queue()
+      filters.forEach(filter =>
+        q.defer(searchFeatures, region, filter)
+      )
+      q.awaitAll(function(err, data) {
+        if (err) throw err
+        this.setState({
+          features: data.map((d,index) => ({
+            filter: filters[index],
+            features: d.features
+          })),
+          updating: false
+        })
+      }.bind(this))
+      const hotProjects = searchHotProjectsInRegion(region)
+      this.setState({ hotProjects })
+    }).bind(this));
   }
 
 

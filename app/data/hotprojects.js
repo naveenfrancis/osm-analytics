@@ -16,10 +16,10 @@ export function load(callback) {
   }
 
   request
-  .get('https://s3.amazonaws.com/osma/hotprojects.geojson')
+  .get('https://tasks.hotosm.org/api/v1/project/search')
   .end(function(err, res) {
     if (err) return callback(err)
-    hotprojects = res.body
+    hotprojects = res.body.mapResults
     callback(null)
   })
 }

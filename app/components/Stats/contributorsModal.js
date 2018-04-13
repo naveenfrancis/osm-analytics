@@ -4,9 +4,11 @@ import * as request from 'superagent'
 import { queue } from 'd3-queue'
 import { parse, DOM } from 'xml-parse'
 
+const initialHowMany = 10
+
 class ContributorsModal extends Component {
   state = {
-    howMany: 10,
+    howMany: initialHowMany,
     loading: false
   }
 
@@ -41,14 +43,14 @@ class ContributorsModal extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (!nextProps.isOpen) return
-    this.loadUserNamesFor(nextProps.contributors.slice(0,10).map(contributor => contributor.uid))
-    this.setState({ howMany: 10 })
+    this.loadUserNamesFor(nextProps.contributors.slice(0,initialHowMany).map(contributor => contributor.uid))
+    this.setState({ howMany: initialHowMany })
   }
 
   expand() {
-    this.loadUserNamesFor(this.props.contributors.slice(this.state.howMany,this.state.howMany+10).map(contributor => contributor.uid))
+    this.loadUserNamesFor(this.props.contributors.slice(this.state.howMany,this.state.howMany+initialHowMany).map(contributor => contributor.uid))
     this.setState({
-      howMany: this.state.howMany + 10
+      howMany: this.state.howMany + initialHowMany
     })
   }
 

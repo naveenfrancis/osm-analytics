@@ -5,10 +5,7 @@ import osmtogeojson from 'osmtogeojson'
 import { simplify, polygon } from 'turf'
 import Fuse from 'fuse.js'
 import Autosuggest from 'react-autosuggest'
-import hotProjects from '../../data/hotprojects.js'
 import style from './style.css'
-
-var hotProjectsList
 
 function fuse (data) {
   return new Fuse(data, {
@@ -35,30 +32,39 @@ class SearchBox extends Component {
     var regionName = this.state.currentValue
     if (regionName && (event.type === 'click' || event.which === 13)) {
       if (regionName.match(/^\d+$/)) {
-        let best = this.getSuggestions(regionName)[0]
-        this.setState({currentValue: best.name})
-        this.go(best)
+        this.getSuggestions(regionName, (function(err, results) {
+          let best = results[0]
+          if (best && best.id == regionName) {
+            this.go(best)
+          }
+        }).bind(this))
       } else {
         this.goOSM(regionName)
       }
     }
   }
   getSuggestions(input, callback) {
-    let suggestions = this.state.fuse.search(input)
-    suggestions.sort((a, b) => {
-      let diff = a.score - b.score
-      return diff || (a.item.name < b.item.name ? -1 : 1)
+    request
+    .get('https://tasks.hotosm.org/api/v1/project/search')
+    .query({
+      textSearch: input
     })
-    suggestions = suggestions.map(s => s.item)
-
-    if (input.match(/^\d+$/)) {
-      suggestions = hotProjectsList.filter(p => p.id === +input).concat(suggestions)
-    }
-
-    if (callback) {
-      callback(null, suggestions);
-    }
-    return suggestions
+    .use(superagentPromisePlugin)
+    .then(function(res) {
+      var suggestions = res.body.results.map(function(result) {
+        return {
+          id: result.projectId,
+          name: result.name
+        }
+      })
+      callback(null, suggestions)
+    })
+    .catch(function(err) {
+      if (err.status === 404)
+        callback(null, [])
+      else
+        callback(err)
+    });
   }
 
   go(where) {
@@ -124,7 +130,7 @@ class SearchBox extends Component {
         <Autosuggest
           suggestions={::this.getSuggestions}
           suggestionRenderer={s => ('#'+s.id+' '+s.name)}
-          suggestionValue={s => s.name}
+          suggestionValue={s => s.id}
           onSuggestionSelected={s => this.go(s)}
           value={this.state.currentValue}
           scrollBar
@@ -145,15 +151,10 @@ class SearchBox extends Component {
   }
 
   componentDidMount() {
-    hotProjectsList = hotProjects().features.map(f => ({ id: f.id, name: f.properties.name }))
-    this.setState({
-      fuse: fuse(hotProjectsList)
-    })
-
     if (this.props.selectedRegion) {
       if (this.props.selectedRegion.type === 'hot') {
         this.setState({
-          currentValue: hotProjectsList.find(p => p.id === this.props.selectedRegion.id).name
+          currentValue: ""+this.props.selectedRegion.id
         })
       }
     }
@@ -162,7 +163,7 @@ class SearchBox extends Component {
     if (nextProps.selectedRegion) {
       if (nextProps.selectedRegion.type === 'hot') {
         this.setState({
-          currentValue: hotProjectsList.find(p => p.id === nextProps.selectedRegion.id).name
+          currentValue: ""+nextProps.selectedRegion.id
         })
       }
     }

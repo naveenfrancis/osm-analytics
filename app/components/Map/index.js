@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import style from './style.css'
 import glStyles, { getCompareStyles } from './glstyles'
 import Swiper from './swiper'
-import HotOverlay from './hotOverlay'
 import FilterButton from '../FilterButton'
 import SearchBox from '../SearchBox'
 import Legend from '../Legend'
@@ -34,7 +33,6 @@ class Map extends Component {
       <div className={containerClassName}>
         <div id="map" style={embed ? { bottom: 30 } : {}}>
         </div>
-        <HotOverlay enabled={this.props.map.hotOverlay} leaflet={map} />
         {this.props.map.view === 'compare'
           ? <Swiper onMoved={::this.swiperMoved} theme={themes[theme]} />
           : ''
@@ -50,7 +48,6 @@ class Map extends Component {
         <Legend
           featureType={this.props.map.filters[0]}
           zoom={this.state.mapZoomLevel}
-          hotOverlayEnabled={this.props.map.hotOverlay}
           showHighlighted={embed === false}
           theme={theme}
         />
@@ -239,41 +236,46 @@ class Map extends Component {
       map.removeLayer(boundsLayer)
     }
     if (region === null) return
-    boundsLayer = L[poly.shape](
-      [[[-85.0511287798,-1E5],[85.0511287798,-1E5],[85.0511287798,2E5],[-85.0511287798,2E5],[-85.0511287798,-1E5]]]
-      .concat(regionToCoords(region, 'leaflet')), {
-      weight: poly.weight,
-      color: poly.color,
-      interactive: false
-    }).addTo(map)
+    regionToCoords(region, 'leaflet')
+    .then(function(region) {
+      let coords = region.geometry.coordinates
 
-    if (isEditable) {
-      boundsLayer.enableEdit()
-    }
+      boundsLayer = L[poly.shape](
+        [[[-85.0511287798,-1E5],[85.0511287798,-1E5],[85.0511287798,2E5],[-85.0511287798,2E5],[-85.0511287798,-1E5]]]
+        .concat(coords), {
+        weight: poly.weight,
+        color: poly.color,
+        interactive: false
+      }).addTo(map)
 
-    // set map view to region
-    try { // geometry calculcation are a bit hairy for invalid geometries (which may happen during polygon editing)
-      let viewPort = bboxPolygon(map.getBounds().toBBoxString().split(',').map(Number))
-      let xorAreaViewPort = erase(viewPort, L.polygon(boundsLayer.getLatLngs()[1]).toGeoJSON())
-      let fitboundsFunc
-      if (moveDirectly) {
-        fitboundsFunc = ::map.fitBounds
-        moveDirectly = false
-      } else if (
-        !xorAreaViewPort // new region fully includes viewport
-        || area(xorAreaViewPort) > area(viewPort)*(1-0.01) // region is small compared to current viewport (<10% of the area covered) or feature is outside current viewport
-      ) {
-        fitboundsFunc = ::map.flyToBounds
-      } else {
-        fitboundsFunc = () => {}
+      if (isEditable) {
+        boundsLayer.enableEdit()
       }
-      fitboundsFunc(
-        L.polygon(boundsLayer.getLatLngs()[1]).getBounds(), // zoom to inner ring!
-      {
-        paddingTopLeft: [20, 10+52],
-        paddingBottomRight: [20, 10+ ((fitBoundsWithBottomPadding) ? 212 : 52)]
-      })
-    } catch(e) {}
+
+      // set map view to region
+      try { // geometry calculcation are a bit hairy for invalid geometries (which may happen during polygon editing)
+        let viewPort = bboxPolygon(map.getBounds().toBBoxString().split(',').map(Number))
+        let xorAreaViewPort = erase(viewPort, L.polygon(boundsLayer.getLatLngs()[1]).toGeoJSON())
+        let fitboundsFunc
+        if (moveDirectly) {
+          fitboundsFunc = ::map.fitBounds
+          moveDirectly = false
+        } else if (
+          !xorAreaViewPort // new region fully includes viewport
+          || area(xorAreaViewPort) > area(viewPort)*(1-0.01) // region is small compared to current viewport (<10% of the area covered) or feature is outside current viewport
+        ) {
+          fitboundsFunc = ::map.flyToBounds
+        } else {
+          fitboundsFunc = () => {}
+        }
+        fitboundsFunc(
+          L.polygon(boundsLayer.getLatLngs()[1]).getBounds(), // zoom to inner ring!
+        {
+          paddingTopLeft: [20, 10+52],
+          paddingBottomRight: [20, 10+ ((fitBoundsWithBottomPadding) ? 212 : 52)]
+        })
+      } catch(e) {}
+    });
   }
 
   setTimeFilter(timeFilter) {

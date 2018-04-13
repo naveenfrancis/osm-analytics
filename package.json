@@ -48,7 +48,7 @@
     "rc-menu": "^4.10.8",
     "react": "^0.14.8",
     "react-autocomplete": "^0.2.1",
-    "react-autosuggest": "github:moroshko/react-autosuggest#785ee38a752a929cceacec0e9207175592446a1a",
+    "react-autosuggest": "2.1.0",
     "react-dom": "^0.14.7",
     "react-hot-loader": "^1.3.0",
     "react-modal": "^0.6.1",

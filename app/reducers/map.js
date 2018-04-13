@@ -18,7 +18,6 @@ const initialState = {
   region: null,
   filters: defaults.filters,
   overlay: defaults.overlay,
-  hotOverlay: false,
   theme: 'default'
 }
 
@@ -119,16 +118,6 @@ export default handleActions({
     })
   },
 
-  'enable hot overlay' (state, action) {
-    return Object.assign({}, state, {
-      hotOverlay: true
-    })
-  },
-  'disable hot overlay' (state, action) {
-    return Object.assign({}, state, {
-      hotOverlay: false
-    })
-  },
   'set embed from url' (state, action) {
     return Object.assign({}, state, {
       embed: action.payload

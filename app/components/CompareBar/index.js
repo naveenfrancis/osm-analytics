@@ -97,38 +97,41 @@ class CompareBar extends Component {
 
   update(region, filters) {
     const filter = filters[0]
-    region = polygon(regionToCoords(region))
-    this.setState({ updating: true, featureCounts: {} })
-    var q = queue()
-    var featureCounts = {}
-    filters.forEach(filter => {
-      featureCounts[filter] = []
-      timeOptions.forEach((timeOption, timeIdx) => {
-        if (timeOption.except && timeOption.except.indexOf(filter) >= 0) return
-        q.defer(function(region, filter, time, callback) {
-          searchFeatures(region, filter, time, function(err, data) {
-            if (err) callback(err)
-            else {
-              featureCounts[filter][timeIdx] = {
-                id: timeOption.id,
-                day: +timeOption.timestamp,
-                value: filter === 'highways' || filter === 'waterways'
-                  ? data.features.reduce((prev, feature) => prev + (feature.properties._length || 0.0), 0.0)
-                  : data.features.reduce((prev, feature) => prev + (feature.properties._count || 1), 0)
+    regionToCoords(region)
+    .then((function(coords) {
+      region = regionToCoords(region)
+      this.setState({ updating: true, featureCounts: {} })
+      var q = queue()
+      var featureCounts = {}
+      filters.forEach(filter => {
+        featureCounts[filter] = []
+        timeOptions.forEach((timeOption, timeIdx) => {
+          if (timeOption.except && timeOption.except.indexOf(filter) >= 0) return
+          q.defer(function(region, filter, time, callback) {
+            searchFeatures(region, filter, time, function(err, data) {
+              if (err) callback(err)
+              else {
+                featureCounts[filter][timeIdx] = {
+                  id: timeOption.id,
+                  day: +timeOption.timestamp,
+                  value: filter === 'highways' || filter === 'waterways'
+                    ? data.features.reduce((prev, feature) => prev + (feature.properties._length || 0.0), 0.0)
+                    : data.features.reduce((prev, feature) => prev + (feature.properties._count || 1), 0)
+                }
+                callback(null)
               }
-              callback(null)
-            }
-          })
-        }, region, filter, timeOption.id)
+            })
+          }, region, filter, timeOption.id)
+        })
       })
-    })
-    q.awaitAll(function(err) {
-      if (err) throw err
-      this.setState({
-        featureCounts,
-        updating: false
-      })
-    }.bind(this))
+      q.awaitAll(function(err) {
+        if (err) throw err
+        this.setState({
+          featureCounts,
+          updating: false
+        })
+      }.bind(this))
+    }).bind(this));
   }
 
   disableCompareView() {
