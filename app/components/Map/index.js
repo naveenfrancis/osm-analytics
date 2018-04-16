@@ -48,7 +48,7 @@ class Map extends Component {
         <Legend
           featureType={this.props.map.filters[0]}
           zoom={this.state.mapZoomLevel}
-          showHighlighted={embed === false}
+          showHighlighted={embed === false && !!this.props.stats.timeFilter}
           theme={theme}
         />
       </div>
