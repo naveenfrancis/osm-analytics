@@ -12,6 +12,7 @@ import { bboxPolygon, area, erase } from 'turf'
 import { debounce } from 'lodash'
 import regionToCoords from './regionToCoords'
 import themes from '../../settings/themes'
+import settings from '../../settings/settings'
 
 // leaflet plugins
 import * as _leafletmapboxgljs from '../../libs/leaflet-mapbox-gl.js'
@@ -70,13 +71,9 @@ class Map extends Component {
     map.on('editable:editing', debounce(::this.setCustomRegion, 200))
     map.on('zoomend', (e) => { this.setState({ mapZoomLevel:map.getZoom() }) })
 
-    var mapbox_token = 'pk.eyJ1IjoiaG90IiwiYSI6ImNpbmx4bWN6ajAwYTd3OW0ycjh3bTZvc3QifQ.KtikS4sFO95Jm8nyiOR4gQ';
-    //L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //    attribution: '&copy; <a href="www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-    //}).addTo(map)
-    L.tileLayer('https://api.mapbox.com/v4/mapbox.light/{z}/{x}/{y}.png?access_token=' + mapbox_token, {
-      attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-        zIndex: -1
+    L.tileLayer(settings['map-background-tile-layer'], {
+      attribution: settings['map-attribution'],
+      zIndex: -1
     }).addTo(map)
 
     if (!mapboxgl.supported()) {
