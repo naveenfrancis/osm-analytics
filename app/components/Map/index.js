@@ -57,10 +57,6 @@ class Map extends Component {
 
   componentDidMount() {
 
-    if (process.env.NODE_ENV !== 'production') {
-      //glStyle.sources['osm-buildings-aggregated'].tiles[0] = glStyle.sources['osm-buildings-aggregated'].tiles[0].replace('52.50.120.37', 'localhost')
-      //glStyle.sources['osm-buildings-raw'].tiles[0] = glStyle.sources['osm-buildings-raw'].tiles[0].replace('52.50.120.37', 'localhost')
-    }
     const { theme, embed } = this.props
 
     map = L.map(
