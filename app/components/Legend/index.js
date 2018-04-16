@@ -12,10 +12,10 @@ class Legend extends Component {
   render() {
     const { showHighlighted, featureType, theme }  = this.props
     const featureTypeDescription = featureTypeOptions.find(f => f.id === featureType).description
-    const { aggregatedFill, hightlightFill } = themes[theme]['styles'][featureType]
+    const { aggregatedFill, highlightFill } = themes[theme]['styles'][featureType]
 
     const aggregatedStyle = { backgroundColor: aggregatedFill, borderColor: aggregatedFill }
-    const highligthStyle =  { backgroundColor: hightlightFill, borderColor: aggregatedFill }
+    const highligthStyle =  { backgroundColor: highlightFill, borderColor: highlightFill }
 
     var legendEntries = []
     if (this.props.zoom > 13) {
