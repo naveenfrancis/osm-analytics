@@ -98,8 +98,7 @@ class CompareBar extends Component {
   update(region, filters) {
     const filter = filters[0]
     regionToCoords(region)
-    .then((function(coords) {
-      region = regionToCoords(region)
+    .then((function(region) {
       this.setState({ updating: true, featureCounts: {} })
       var q = queue()
       var featureCounts = {}
