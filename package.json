@@ -30,7 +30,6 @@
     "eslint-plugin-react": "^7.1.0",
     "extract-text-webpack-plugin": "^1.0.1",
     "file-loader": "^0.8.5",
-    "fuse.js": "^2.2.0",
     "history": "^2.1.2",
     "javascript.util": "^0.12.12",
     "json-loader": "^0.5.4",

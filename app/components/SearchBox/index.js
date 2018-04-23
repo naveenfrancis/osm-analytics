@@ -2,24 +2,13 @@ import React, { Component } from 'react'
 import * as request from 'superagent'
 import superagentPromisePlugin from 'superagent-promise-plugin'
 import { simplify, polygon } from 'turf'
-import Fuse from 'fuse.js'
 import Autosuggest from 'react-autosuggest'
 import style from './style.css'
-
-function fuse (data) {
-  return new Fuse(data, {
-    keys: ['name'],
-    include: ['score'],
-    threshold: 0.4,
-    shouldSort: false
-  });
-}
 
 class SearchBox extends Component {
   state = {
     active: true,
-    currentValue: '',
-    fuse: null
+    currentValue: ''
   }
 
   onClick() {
