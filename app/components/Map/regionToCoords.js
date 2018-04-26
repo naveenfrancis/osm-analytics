@@ -1,4 +1,4 @@
-import { bboxPolygon, polygon, multipolygon, flip, simplify } from 'turf'
+import { bboxPolygon, polygon, flip, simplify } from 'turf'
 import * as request from 'superagent'
 import superagentPromisePlugin from 'superagent-promise-plugin'
 import 'promise'
@@ -14,10 +14,12 @@ export default function regionToCoords(region, latLngOrder) {
       let geometry = res.body
       if (geometry.type === 'MultiPolygon' && geometry.coordinates.length === 1) {
         return polygon(geometry.coordinates[0])
-      } else if (geometry.type === 'Polygon') {
-        return polygon(geometry.coordinates)
       } else {
-        return multipolygon(geometry.coordinates)
+        return {
+          type: 'Feature',
+          properties: {},
+          geometry: geometry
+        }
       }
     }).catch(function(err) {
       if (err.status == 404) {

@@ -262,7 +262,10 @@ class Map extends Component {
           fitboundsFunc = () => {}
         }
         fitboundsFunc(
-          L.polygon(boundsLayer.getLatLngs()[1]).getBounds(), // zoom to inner ring!
+          // zoom to inner ring!
+          boundsLayer.getLatLngs().slice(1)
+            .map(coords => L.polygon(coords).getBounds())
+            .reduce((bounds1, bounds2) => bounds1.extend(bounds2)),
         {
           paddingTopLeft: [20, 10+52],
           paddingBottomRight: [20, 10+ ((fitBoundsWithBottomPadding) ? 212 : 52)]
