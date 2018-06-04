@@ -37,7 +37,6 @@ a:hover {
   color: #4B5A6A
 }
 a.link {
-  font-size: 14px;
   border-bottom: 1px solid #838383;
   &:hover {
     border-bottom-color: #4B5A6A;

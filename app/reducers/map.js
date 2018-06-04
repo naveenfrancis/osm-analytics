@@ -23,16 +23,20 @@ const initialState = {
 
 export default handleActions({
   'set region' (state, action) {
+    var view = state.view
+    if (view === 'default') view = 'show'
     var newState = Object.assign({}, state, {
-      view: state.view === 'default' ? 'show' : state.view,
+      view,
       region: action.payload
     })
     updateURL(newState)
     return newState
   },
   'set region from url' (state, action) {
+    var view = state.view
+    if (view === 'default') view = 'show'
     return Object.assign({}, state, {
-      view: state.view === 'default' ? 'show' : state.view,
+      view,
       region: parseRegionFromUrl(action.payload)
     })
   },
@@ -138,9 +142,18 @@ function updateURL(state) {
     : 'none'
   const overlayPart = state.overlay
   const timesPart = state.times.join('...')
-  const options = state.view === 'compare'
-    ? timesPart + '/' + filtersPart
-    : filtersPart + '/' + overlayPart
+  var options
+  switch (state.view){
+    case 'compare':
+      options = timesPart + '/' + filtersPart
+      break
+    case 'gaps-region':
+    case 'gaps':
+      options = filtersPart
+      break
+    default:
+      options = filtersPart + '/' + overlayPart
+  }
 
   const embed = state.embed ? '/embed' : ''
   const theme = state.theme ? '/' + state.theme : ''
