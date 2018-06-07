@@ -64,7 +64,7 @@ class GapsMap extends Component {
       minZoom: 2,
       scrollWheelZoom: !embed
     })
-    .setView([0, 35], 2)
+    .setView([2, 26], 4)
     map.zoomControl.setPosition('bottomright')
     map.on('editable:editing', debounce(::this.setCustomRegion, 200))
     map.on('zoomend', (e) => { this.setState({ mapZoomLevel:map.getZoom() }) })
