@@ -137,7 +137,15 @@ export default handleActions({
 }, initialState)
 
 function updateURL(state) {
-  const view = state.view === 'country' ? 'show' : state.view
+  var view = state.view
+  switch (view) {
+    case 'gaps-region':
+      view = 'gaps'
+      break
+    case 'country':
+      view = 'show'
+      break
+  }
   const region = state.region
   const filtersPart = state.filters.length > 0
     ? state.filters.sort().join(',')
@@ -145,7 +153,7 @@ function updateURL(state) {
   const overlayPart = state.overlay
   const timesPart = state.times.join('...')
   var options
-  switch (state.view){
+  switch (view) {
     case 'compare':
       options = timesPart + '/' + filtersPart
       break
