@@ -1,4 +1,4 @@
-div#stats {
+div#stats, div#gaps-stats {
   display: block;
   position: absolute;
   bottom: 0;
@@ -20,12 +20,6 @@ div#stats {
       display: inline-block;
       margin-right: 12px;
       line-height: 16px;
-    }
-    li:first-child {
-      margin-right: 24px;
-      border-right: 1px solid #979797;
-      padding-right: 18px;
-      height: 36px;
       vertical-align: top;
     }
     p {
@@ -40,6 +34,25 @@ div#stats {
     a:hover {
       color: #DDDDDD;
     }
+  }
+
+  &#stats ul.metrics li:first-child {
+    margin-right: 24px;
+    border-right: 1px solid #979797;
+    padding-right: 18px;
+    height: 36px;
+    vertical-align: top;
+  }
+
+  &#gaps-stats ul.metrics li:nth-child(2) {
+    margin-right: 24px;
+    border-right: 1px solid #979797;
+    padding-right: 18px;
+    height: 36px;
+    vertical-align: top;
+  }
+  &#gaps-stats ul.metrics li:nth-child(3) {
+    text-align: right;
   }
 
   div.chart {

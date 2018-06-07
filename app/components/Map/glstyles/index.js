@@ -4,6 +4,7 @@ import buildings from './buildings.json'
 import highways from './highways.json'
 import waterways from './waterways.json'
 import pois from './pois.json'
+import ghsBuiltup from './ghs-builtup.json'
 
 import settings from '../../../settings/settings'
 import { filters as filterOptions } from '../../../settings/options'
@@ -35,10 +36,13 @@ export default function getStyle(filters, options) {
     highways: applyTheme(currentTheme, highways),
     waterways: applyTheme(currentTheme, waterways),
     pois: applyTheme(currentTheme, pois),
+    'ghs-builtup': applyTheme(currentTheme, ghsBuiltup),
   }
 
   var allSources = {}
-  filterOptions.forEach(filterOption => {
+  filterOptions
+  .concat([{id: 'ghs-builtup'}])
+  .forEach(filterOption => {
     let style = filterOption.id
     if (!filterStyles[style]) throw new Error('gl style undefined for feature type ', filterOption)
     Object.keys(filterStyles[style].sources).forEach(source => {
@@ -79,9 +83,6 @@ export default function getStyle(filters, options) {
         return 0
       })
   }
-  buildings,
-  highways,
-  waterways
 }
 
 export function getCompareStyles(filters, compareTimes, theme) {
@@ -95,4 +96,16 @@ export function getCompareStyles(filters, compareTimes, theme) {
   glCompareLayerStyles.before.layers = glCompareLayerStyles.before.layers.filter(layer => !layer.source.match(/highlight/))
   glCompareLayerStyles.after.layers = glCompareLayerStyles.before.layers.filter(layer => !layer.source.match(/highlight/))
   return glCompareLayerStyles
+}
+
+export function getGapsStyles(theme) {
+  const osmSource = settings['vt-source']
+  const referenceSource = 'http://129.206.7.145:7778/{z}/{x}/{y}.pbf'
+  var glGapLayerStyles = {
+    osm: JSON.parse(JSON.stringify(getStyle(['buildings'], { source: osmSource, theme }))),
+    reference: JSON.parse(JSON.stringify(getStyle(['ghs-builtup'])))
+  }
+  // don't need highlight layers
+  glGapLayerStyles.osm.layers = glGapLayerStyles.osm.layers.filter(layer => !layer.source.match(/highlight/))
+  return glGapLayerStyles
 }

@@ -108,6 +108,22 @@
         }
       }
 
+      &.builtup {
+        &.feature {
+          border-style: solid;
+          border-width: 1px;
+        }
+        &.high {
+          opacity: 1.0;
+        }
+        &.mid {
+          opacity: 0.55;
+        }
+        &.low {
+          opacity: 0.1;
+        }
+      }
+
       &.hot-projects {
         border-color: #3388FF;
         border-width: 2px;

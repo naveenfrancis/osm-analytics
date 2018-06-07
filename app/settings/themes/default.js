@@ -2,6 +2,7 @@ import themeBuildings from './templates/buildings'
 import themeHighways from './templates/highways'
 import themePois from './templates/pois'
 import themeWaterways from './templates/waterways'
+import themeBuiltup from './templates/builtup'
 
 const buildings = {
   aggregatedFill: '#FDB863',
@@ -22,6 +23,11 @@ const pois = {
 const waterways = {
   aggregatedFill: '#c89ab7',
   highlightFill: '#5CBAD8'
+}
+
+const builtup = {
+  aggregatedFill: '#666',
+  highlightFill: '#666'
 }
 
 export default {
@@ -66,11 +72,13 @@ export default {
     buildings,
     highways,
     pois,
-    waterways
+    waterways,
+    builtup,
   },
 
   buildings: themeBuildings(buildings),
   highways: themeHighways(highways),
   pois: themePois(pois),
-  waterways: themeWaterways(waterways)
+  waterways: themeWaterways(waterways),
+  builtup: themeBuiltup(builtup)
 }

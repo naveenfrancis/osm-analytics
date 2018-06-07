@@ -15,7 +15,7 @@ class Legend extends Component {
     const { aggregatedFill, highlightFill } = themes[theme]['styles'][featureType]
 
     const aggregatedStyle = { backgroundColor: aggregatedFill, borderColor: aggregatedFill }
-    const highligthStyle =  { backgroundColor: highlightFill, borderColor: highlightFill }
+    const builtupStyle =  { backgroundColor: "#666", borderColor: "#666" }
 
     var legendEntries = []
     if (this.props.zoom > 13) {
@@ -24,15 +24,14 @@ class Legend extends Component {
           style={aggregatedStyle}
           className={'legend-icon feature '+featureType} />
         {featureTypeDescription}
-        </li>)
-      if (showHighlighted === true) {
-        legendEntries.push(<li>
+        </li>,
+        <li>
           <span
-            style={highligthStyle}
-            className={'legend-icon feature highlight '+featureType}></span>
-          Highlighted {featureTypeDescription.toLowerCase()}
-        </li>)
-      }
+            style={builtupStyle}
+            className={'legend-icon feature '+featureType} />
+          built-up area
+          </li>
+      )
     } else {
       legendEntries.push(
         <li>
@@ -45,15 +44,21 @@ class Legend extends Component {
           <span style={aggregatedStyle} className={'legend-icon low '+featureType}></span>
           Low density of {featureTypeDescription.toLowerCase()}</li>
       )
-      if (showHighlighted === true) {
-        legendEntries.push(<li>
-          <span style={highligthStyle} className={'legend-icon highlight '+featureType}></span>
-          Area with mostly highlighted {featureTypeDescription.toLowerCase()}</li>)
-      }
+      legendEntries.push(
+        <li>
+          <span style={builtupStyle} className={'legend-icon high '}></span>
+          High density of buit-up area</li>,
+        <li>
+          <span style={builtupStyle} className={'legend-icon mid '}></span>
+          Medium density of buit-up area</li>,
+        <li>
+          <span style={builtupStyle} className={'legend-icon low '}></span>
+          Low density of buit-up area</li>
+      )
     }
     return (
       <ul id="legend" style={themes[theme].legend}>
-        <li><h3>Map Legend</h3> Gaps</li>
+        <li><h3>Map Legend</h3></li>
         {legendEntries}
         <li>Last Data Update: {this.state.lastModified
         ? <span title={this.state.lastModified}>{moment(this.state.lastModified).fromNow()}</span>

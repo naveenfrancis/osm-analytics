@@ -15,6 +15,7 @@ import HotProjectsModal from './hotProjectsModal'
 import regionToCoords from '../Map/regionToCoords'
 import searchHotProjectsInRegion from './searchHotProjects'
 import searchFeatures from './searchFeatures'
+import searchBuiltupAreas from './searchBuiltupAreas'
 import { filters } from '../../settings/options'
 import unitSystems from '../../settings/unitSystems'
 import style from './style.css'
@@ -30,72 +31,19 @@ class GapsStats extends Component {
   render() {
     var features = this.state.features
 
-    // apply time and experience filters
-    features.forEach(filter => {
-      // do not override!
-      filter.highlightedFeatures = filter.features.filter(feature =>
-        this.props.stats.timeFilter === null
-        || (
-          feature.properties._timestamp >= this.props.stats.timeFilter[0]
-          && feature.properties._timestamp <= this.props.stats.timeFilter[1]
-        )
-        || (
-          feature.properties._timestampMax >= this.props.stats.timeFilter[0]
-          && feature.properties._timestampMin <= this.props.stats.timeFilter[1]
-        )
-      ).filter(feature =>
-        this.props.stats.experienceFilter === null
-        || (
-          feature.properties._userExperience >= this.props.stats.experienceFilter[0]
-          && feature.properties._userExperience <= this.props.stats.experienceFilter[1]
-        )
-        || (
-          feature.properties._userExperienceMax >= this.props.stats.experienceFilter[0]
-          && feature.properties._userExperienceMin <= this.props.stats.experienceFilter[1]
-        )
-      )
-    })
-
-    // calculate number of contributors
-    var contributors = {}
-    features.forEach(filter => {
-      filter.highlightedFeatures.forEach(f => {
-        contributors[f.properties._uid] = (contributors[f.properties._uid] || 0) + 1
-      })
-    })
-    contributors = Object.keys(contributors).map(uid => ({
-      uid: uid,
-      contributions: contributors[uid]
-    })).sort((a,b) => b.contributions - a.contributions)
-    var numContributors = contributors.length
-    if (numContributors === 1 && contributors[0].uid === "undefined") {
-      // on the low zoom levels we don't have complete data, and estimating this number from a sample is tricky. maybe Good-Turing estimation could be used here? see https://en.wikipedia.org/wiki/Good%E2%80%93Turing_frequency_estimation
-      numContributors = null
-    }
-
-    var timeFilter = ''
-    if (this.props.stats.timeFilter) {
-      timeFilter = (
-        <span className="descriptor">{moment.unix(this.props.stats.timeFilter[0]).format('YYYY MMMM D')} – {moment.unix(this.props.stats.timeFilter[1]).format('YYYY MMMM D')}</span>
-      )
-    }
-
     // todo: loading animation if region is not yet fully loaded
     return (
-      <div id="stats" className={this.state.updating ? 'updating' : ''}>
+      <div id="gaps-stats" className={this.state.updating ? 'updating' : ''}>
         <ul className="metrics">
-          <li>
-            <OverlayButton enabledOverlay={this.props.map.overlay} {...this.props.actions} {...this.props.statsActions}/>
-            {timeFilter}
-          </li>
+          <li><p>OSM</p></li>
         {features.map(filter => {
           return (<li key={filter.filter} title={filters.find(f => f.id === filter.filter).altText}>
             <span className="number">{
               numberWithCommas(Number((filter.filter === 'highways' || filter.filter === 'waterways'
                 ? unitSystems[this.props.stats.unitSystem].distance.convert(
-                  filter.highlightedFeatures.reduce((prev, feature) => prev+(feature.properties._length || 0.0), 0.0)
+                  filter.features.reduce((prev, feature) => prev+(feature.properties._length || 0.0), 0.0)
                 )
-                : filter.highlightedFeatures.reduce((prev, feature) => prev+(feature.properties._count || 1), 0))
+                : filter.features.reduce((prev, feature) => prev+(feature.properties._count || 1), 0))
               ).toFixed(0))
             }</span><br/>
             {filter.filter === 'highways' || filter.filter === 'waterways'
@@ -110,22 +58,15 @@ class GapsStats extends Component {
           </li>)
         })}
           <li>
-            <span className="number">{this.state.hotProjects.length > 0
-            ? <a className="link" onClick={::this.openHotModal} target="_blank">{this.state.hotProjects.length}</a>
-            : this.state.hotProjects.length
-            }</span><br/><span className="descriptor">HOT Projects</span>
+            <span className="number">{numberWithCommas(Math.round(this.state.builtupArea/10000))}</span><br/><span className="descriptor">hectare built-up area</span>
           </li>
           <li>
-            <span className="number">{!numContributors
-            ? numContributors === 0 ? '0' : <span title='select a smaller region (~city level) to see the exact number of contributors and get a list of the top contributors in that region'>many</span>
-            : <a className="link" onClick={::this.openContributorsModal} target="_blank">{numberWithCommas(numContributors)}</a>
-            }</span><br/><span className="descriptor">Contributors</span>
+            <p><a href="http://ghsl.jrc.ec.europa.eu/ghs_bu.php">GHS</a></p>
           </li>
         </ul>
 
         <div className="buttons">
-          <button className="compare-toggle" onClick={::this.enableCompareView}>Compare Time Periods</button>
-          <a href="#"><button className="close">Close</button></a>
+          <a href="#/gaps"><button className="close">Close</button></a>
         </div>
 
       </div>
@@ -154,37 +95,21 @@ class GapsStats extends Component {
       filters.forEach(filter =>
         q.defer(searchFeatures, region, filter)
       )
+      q.defer(searchBuiltupAreas, region)
       q.awaitAll(function(err, data) {
         if (err) throw err
         this.setState({
-          features: data.map((d,index) => ({
+          features: data.slice(0, -1).map((d,index) => ({
             filter: filters[index],
             features: d.features
           })),
+          builtupArea: data.slice(-1),
           updating: false
         })
       }.bind(this))
       const hotProjects = searchHotProjectsInRegion(region)
       this.setState({ hotProjects })
     }).bind(this));
-  }
-
-
-  openHotModal() {
-    this.setState({ hotProjectsModalOpen: true })
-  }
-  closeHotModal() {
-    this.setState({ hotProjectsModalOpen: false })
-  }
-  openContributorsModal() {
-    this.setState({ contributorsModalOpen: true })
-  }
-  closeContributorsModal() {
-    this.setState({ contributorsModalOpen: false })
-  }
-
-  enableCompareView() {
-    this.props.actions.setView('compare')
   }
 }
 

@@ -22,6 +22,18 @@ export const filters = [
   }
 ]
 
+export const gapsFilters = [
+  {
+    id: 'buildings-vs-pop',
+    description: 'Buildings 🡘 Built-up',
+    altText: 'Compare OpenStreetMap buildings to population data from GHS remote sensing data',
+    layers: {
+      osm: 'buildings',
+      reference: 'ghs-pop'
+    }
+  }
+]
+
 export const overlays = [
   {
     id: 'recency',

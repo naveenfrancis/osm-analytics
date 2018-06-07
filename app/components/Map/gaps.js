@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import style from './style.css'
-import glStyles, { getCompareStyles } from './glstyles'
+import glStyles, { getGapsStyles } from './glstyles'
 import Swiper from './swiper'
-import FilterButton from '../FilterButton'
+import GapsFilterButton from '../FilterButton/gaps.js'
 import SearchBox from '../SearchBox'
 import GapsLegend from '../Legend/gaps.js'
 import { bindActionCreators } from 'redux'
@@ -13,6 +13,7 @@ import { debounce } from 'lodash'
 import regionToCoords from './regionToCoords'
 import themes from '../../settings/themes'
 import settings from '../../settings/settings'
+import { gapsFilters } from '../../settings/options'
 
 // leaflet plugins
 import * as _leafletmapboxgljs from '../../libs/leaflet-mapbox-gl.js'
@@ -34,16 +35,13 @@ class GapsMap extends Component {
       <div className={containerClassName}>
         <div id="map" style={embed ? { bottom: 30 } : {}}>
         </div>
-        {this.props.map.view === 'compare'
-          ? <Swiper onMoved={::this.swiperMoved} theme={themes[theme]} />
-          : ''
-        }
+        <Swiper onMoved={::this.swiperMoved} theme={themes[theme]} />
 
         {embed === false && <div>
           <SearchBox className="searchbox" selectedRegion={this.props.map.region} {...actions}/>
           <span className="search-alternative">or</span>
           <button className="outline" onClick={::this.setViewportRegion}>Outline Custom Area</button>
-          <FilterButton enabledFilters={this.props.map.filters} {...actions}/>
+          <GapsFilterButton enabledFilters={[gapsFilters[0].id]} {...actions}/>
         </div>}
 
         <GapsLegend
@@ -79,33 +77,25 @@ class GapsMap extends Component {
     if (!mapboxgl.supported()) {
       alert('This browser does not support WebGL which is required to run this application. Please check that you are using a supported browser and that WebGL is enabled.')
     }
-    glLayer = L.mapboxGL({
-      updateInterval: 0,
-      style: glStyles(this.props.map.filters, { theme }),
-      hash: false
-    })
 
-    const glCompareLayerStyles = getCompareStyles(this.props.map.filters, this.props.map.times, theme)
+    const glCompareLayerStyles = getGapsStyles(theme)
     glCompareLayers = {
-      before: L.mapboxGL({
+      left: L.mapboxGL({
         updateInterval: 0,
-        style: glCompareLayerStyles.before,
+        style: glCompareLayerStyles.osm,
         hash: false
       }),
-      after: L.mapboxGL({
+      right: L.mapboxGL({
         updateInterval: 0,
-        style: glCompareLayerStyles.after,
+        style: glCompareLayerStyles.reference,
         hash: false
       })
     }
 
     // add glLayers if map state is already initialized
-    if (this.props.map.view === 'country' || this.props.map.view === 'default') {
-      glLayer.addTo(map)
-    } else if (this.props.map.view === 'compare') {
-      glCompareLayers.before.addTo(map)
-      glCompareLayers.after.addTo(map)
-    }
+    glCompareLayers.left.addTo(map)
+    glCompareLayers.right.addTo(map)
+    this.swiperMoved(window.innerWidth/2)
 
     // init from route params
     if (this.props.view) {
@@ -117,12 +107,6 @@ class GapsMap extends Component {
     }
     if (this.props.filters) {
       this.props.actions.setFiltersFromUrl(this.props.filters)
-    }
-    if (this.props.overlay) {
-      this.props.actions.setOverlayFromUrl(this.props.overlay)
-    }
-    if (this.props.times) {
-      this.props.actions.setTimesFromUrl(this.props.times)
     }
   }
 
@@ -274,64 +258,14 @@ class GapsMap extends Component {
     });
   }
 
-  setTimeFilter(timeFilter) {
-    const { theme } = this.props
-
-    const highlightLayers = glStyles(this.props.map.filters, { theme }).layers.filter(l => l.id.match(/highlight/))
-    if (timeFilter === null) {
-      // reset time filter
-      highlightLayers.forEach(highlightLayer => {
-        glLayer._glMap.setFilter(highlightLayer.id, ["==", "_timestamp", -1])
-      })
-    } else {
-      highlightLayers.forEach(highlightLayer => {
-        let layerFilter = ["any",
-          ["all",
-            [">=", "_timestamp", timeFilter[0]],
-            ["<=", "_timestamp", timeFilter[1]]
-          ],
-          ["all",
-            [">=", "_timestampMin", timeFilter[0]],
-            ["<=", "_timestampMax", timeFilter[1]]
-          ]
-        ]
-        if (highlightLayer.densityFilter) {
-          layerFilter = ["all",
-            highlightLayer.densityFilter,
-            layerFilter
-          ]
-        }
-        glLayer._glMap.setFilter(highlightLayer.id, layerFilter)
-      })
-    }
-  }
-
-  setExperienceFilter(experienceFilter) {
-    const { theme } = this.props
-    const highlightLayers = glStyles(this.props.map.filters, { theme }).layers.map(l => l.id).filter(id => id.match(/highlight/))
-    if (experienceFilter === null) {
-      // reset time filter
-      highlightLayers.forEach(highlightLayer => {
-        glLayer._glMap.setFilter(highlightLayer, ["==", "_timestamp", -1])
-      })
-    } else {
-      highlightLayers.forEach(highlightLayer => {
-        glLayer._glMap.setFilter(highlightLayer, ["all",
-          [">=", "_userExperience", experienceFilter[0]],
-          ["<=", "_userExperience", experienceFilter[1]]
-        ])
-      })
-    }
-  }
-
   swiperMoved(x) {
     if (!map) return
     const mapPanePos = map._getMapPanePos()
     const nw = map.containerPointToLayerPoint([0, 0])
     const se = map.containerPointToLayerPoint(map.getSize())
     const clipX = nw.x + (se.x - nw.x) * x / window.innerWidth
-    glCompareLayers.before._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, clipX+mapPanePos.x, se.y+mapPanePos.y, nw.x+mapPanePos.x].join('px,') + 'px)'
-    glCompareLayers.after._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, se.x+mapPanePos.x, se.y+mapPanePos.y, clipX+mapPanePos.x].join('px,') + 'px)'
+    glCompareLayers.left._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, clipX+mapPanePos.x, se.y+mapPanePos.y, nw.x+mapPanePos.x].join('px,') + 'px)'
+    glCompareLayers.right._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, se.x+mapPanePos.x, se.y+mapPanePos.y, clipX+mapPanePos.x].join('px,') + 'px)'
   }
 
 }
