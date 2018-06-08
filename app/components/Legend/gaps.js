@@ -47,13 +47,13 @@ class Legend extends Component {
       legendEntries.push(
         <li>
           <span style={builtupStyle} className={'legend-icon high '}></span>
-          High density of buit-up area</li>,
+          High percentage of buit-up area</li>,
         <li>
           <span style={builtupStyle} className={'legend-icon mid '}></span>
-          Medium density of buit-up area</li>,
+          Medium percentage of buit-up area</li>,
         <li>
           <span style={builtupStyle} className={'legend-icon low '}></span>
-          Low density of buit-up area</li>
+          Low percentage of buit-up area</li>
       )
     }
     return (
