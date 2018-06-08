@@ -65,7 +65,8 @@ button.filter {
 }
 
 .countryView,
-.compareView {
+.compareView,
+.gaps-regionView {
   .leaflet-bottom {
     margin-bottom: 212px;
   }
