@@ -5,6 +5,7 @@ import Swiper from './swiper'
 import GapsFilterButton from '../FilterButton/gaps.js'
 import SearchBox from '../SearchBox'
 import GapsLegend from '../Legend/gaps.js'
+import DropdownButton from '../DropdownButton'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as MapActions from '../../actions/map'
@@ -20,17 +21,53 @@ import * as _leafletmapboxgljs from '../../libs/leaflet-mapbox-gl.js'
 import * as _leafleteditable from '../../libs/Leaflet.Editable.js'
 
 var map // Leaflet map object
+var backgroundLayer
 var glLayer // mapbox-gl layer
 var glCompareLayers // mapbox-gl layers for before/after view
 var boundsLayer = null // selected region layer
 var moveDirectly = false
 
+var backgrounds = [
+  {
+    id: 'default',
+    description: 'plain base map',
+    url: settings['map-background-tile-layer']
+  },
+  {
+    id: 'mapbox-satellite',
+    description: 'satellite imagery (mapbox)',
+    url: 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaG90IiwiYSI6ImNpbmx4bWN6ajAwYTd3OW0ycjh3bTZvc3QifQ.KtikS4sFO95Jm8nyiOR4gQ'
+  },
+  {
+    id: 'esri-satellite',
+    description: 'satellite imagery (esri)',
+    url: 'https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+  },
+  {
+    id: 'osm',
+    description: 'openstreetmap.org',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+  },
+  {
+    id: 'worldpop',
+    description: 'worldpop.org.uk',
+    url: 'http://maps.worldpop.org.uk/tilesets/wp-global-100m-ppp-2010-adj/{z}/{x}/{y}.png'
+  }
+]
+
 class GapsMap extends Component {
   state = {}
+
+  changeBackground(newLayer) {
+    backgroundLayer.setUrl(backgrounds.find(bg => bg.id === newLayer[0]).url)
+  }
 
   render() {
     const { view, actions, embed, theme } = this.props
     const containerClassName = (embed === false) ? `${view}View` : '';
+
+    var btn = <button className='background-selector' style={{position: 'absolute', top: '122px', right: '25px'}} title='Select Background Layer'>background map&ensp;▾</button>
+
     return (
       <div className={containerClassName}>
         <div id="map" style={embed ? { bottom: 30 } : {}}>
@@ -42,6 +79,13 @@ class GapsMap extends Component {
           <span className="search-alternative">or</span>
           <button className="outline" onClick={::this.setViewportRegion}>Outline Custom Area</button>
           <GapsFilterButton enabledFilters={[gapsFilters[0].id]} {...actions}/>
+          <DropdownButton
+            options={backgrounds}
+            btnElement={btn}
+            multiple={false}
+            selectedKeys={[]}
+            onSelectionChange={::this.changeBackground}
+          />
         </div>}
 
         <GapsLegend
@@ -69,7 +113,7 @@ class GapsMap extends Component {
     map.on('editable:editing', debounce(::this.setCustomRegion, 200))
     map.on('zoomend', (e) => { this.setState({ mapZoomLevel:map.getZoom() }) })
 
-    L.tileLayer(settings['map-background-tile-layer'], {
+    backgroundLayer = L.tileLayer(settings['map-background-tile-layer'], {
       attribution: settings['map-attribution'],
       zIndex: -1
     }).addTo(map)
