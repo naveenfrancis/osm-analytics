@@ -15,6 +15,7 @@ import regionToCoords from './regionToCoords'
 import themes from '../../settings/themes'
 import settings from '../../settings/settings'
 import { gapsFilters } from '../../settings/options'
+import GapsLayer from './gapsLayer.js'
 
 // leaflet plugins
 import * as _leafletmapboxgljs from '../../libs/leaflet-mapbox-gl.js'
@@ -22,6 +23,7 @@ import * as _leafleteditable from '../../libs/Leaflet.Editable.js'
 
 var map // Leaflet map object
 var backgroundLayer
+var gapsLayer
 var glLayer // mapbox-gl layer
 var glCompareLayers // mapbox-gl layers for before/after view
 var boundsLayer = null // selected region layer
@@ -55,6 +57,8 @@ var backgrounds = [
   }
 ]
 
+
+
 class GapsMap extends Component {
   state = {}
 
@@ -72,7 +76,7 @@ class GapsMap extends Component {
       <div className={containerClassName}>
         <div id="map" style={embed ? { bottom: 30 } : {}}>
         </div>
-        <Swiper onMoved={::this.swiperMoved} theme={themes[theme]} />
+        {false ? <Swiper onMoved={::this.swiperMoved} theme={themes[theme]} /> : ""}
 
         {embed === false && <div>
           <SearchBox className="searchbox" selectedRegion={this.props.map.region} {...actions}/>
@@ -118,6 +122,8 @@ class GapsMap extends Component {
       zIndex: -1
     }).addTo(map)
 
+    gapsLayer = (new GapsLayer({tileSize: 512})).addTo(map);
+
     if (!mapboxgl.supported()) {
       alert('This browser does not support WebGL which is required to run this application. Please check that you are using a supported browser and that WebGL is enabled.')
     }
@@ -137,8 +143,8 @@ class GapsMap extends Component {
     }
 
     // add glLayers if map state is already initialized
-    glCompareLayers.left.addTo(map)
-    glCompareLayers.right.addTo(map)
+    glCompareLayers.left//.addTo(map)
+    glCompareLayers.right//.addTo(map)
     this.swiperMoved(window.innerWidth/2)
 
     // init from route params

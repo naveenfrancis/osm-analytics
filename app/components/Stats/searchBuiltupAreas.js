@@ -30,9 +30,7 @@ function fetch(region, callback) {
       )
     })
     // todo: handle tile boundaries / split features (merge features with same osm id)
-    var result = 0
-    output.forEach(feature => result += feature.properties.area)
-    callback(null, result)
+    callback(null, featurecollection(output))
   })
 }
 
@@ -92,6 +90,7 @@ function getAndCacheTile(tile, callback) {
     data.features = data.features.map(feature => {
       var centr = centroid(feature)
       centr.properties = feature.properties
+      centr.properties.tile = tile
       centr.properties.area = centr.properties.area || turf.area(feature.geometry)
       return centr
     })

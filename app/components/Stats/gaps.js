@@ -103,7 +103,8 @@ class GapsStats extends Component {
             filter: filters[index],
             features: d.features
           })),
-          builtupArea: data.slice(-1),
+          //builtupCells: data.slice(-1)[0],
+          builtupArea: data.slice(-1)[0].features.reduce((acc, feature) => acc + feature.properties.area, 0),
           updating: false
         })
       }.bind(this))

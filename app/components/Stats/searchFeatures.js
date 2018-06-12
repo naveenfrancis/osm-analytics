@@ -93,6 +93,7 @@ function getAndCacheTile(tile, filter, time, callback) {
     data.features = data.features.map(feature => {
       var centr = centroid(feature)
       centr.properties = feature.properties
+      centr.properties.tile = tile
       centr.properties._length = centr.properties._length ||
           centr.properties._lineDistance ||
           (feature.geometry.type === "LineString" ? lineDistance(feature, 'kilometers') : 0.0)
