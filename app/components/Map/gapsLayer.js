@@ -22,7 +22,7 @@ export default L.GridLayer.extend({
     // For example, circles which get bigger as we zoom in
     //
     var q = queue()
-    q.defer(loadTile, 'http://osmanalytics:7778/{z}/{x}/{y}.pbf', 'buildup', coords)
+    q.defer(loadTile, 'http://129.206.7.145:7778/{z}/{x}/{y}.pbf', 'buildup', coords)
     q.defer(loadTile, settings['vt-source']+'/buildings/{z}/{x}/{y}.pbf', 'osm', coords)
     q.awaitAll((err, data) => {
       if (err) return done(err);
