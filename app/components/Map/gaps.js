@@ -122,7 +122,7 @@ class GapsMap extends Component {
       zIndex: -1
     }).addTo(map)
 
-    gapsLayer = (new GapsLayer({tileSize: 512})).addTo(map);
+    gapsLayer = (new GapsLayer({tileSize: 512, maxNativeZoom: 13})).addTo(map);
 
     if (!mapboxgl.supported()) {
       alert('This browser does not support WebGL which is required to run this application. Please check that you are using a supported browser and that WebGL is enabled.')
