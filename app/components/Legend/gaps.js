@@ -18,43 +18,61 @@ class Legend extends Component {
     const builtupStyle =  { backgroundColor: "#666", borderColor: "#666" }
 
     var legendEntries = []
-    if (this.props.zoom > 13) {
-      legendEntries.push(<li>
-        <span
-          style={aggregatedStyle}
-          className={'legend-icon feature '+featureType} />
-        {featureTypeDescription}
+    if (true) {
+      legendEntries.push(
+        <li>
+          <span
+            style={{ backgroundColor: "green" }}
+            className='legend-icon' />
+          high osm building completeness
         </li>,
         <li>
           <span
-            style={builtupStyle}
-            className={'legend-icon feature '+featureType} />
-          built-up area
-          </li>
+            style={{ backgroundColor: "red" }}
+            className='legend-icon' />
+          low osm building completeness
+        </li>,
       )
     } else {
-      legendEntries.push(
-        <li>
-          <span style={aggregatedStyle} className={'legend-icon high '+featureType}></span>
-          High density of {featureTypeDescription.toLowerCase()}</li>,
-        <li>
-          <span style={aggregatedStyle} className={'legend-icon mid '+featureType}></span>
-          Medium density of {featureTypeDescription.toLowerCase()}</li>,
-        <li>
-          <span style={aggregatedStyle} className={'legend-icon low '+featureType}></span>
-          Low density of {featureTypeDescription.toLowerCase()}</li>
-      )
-      legendEntries.push(
-        <li>
-          <span style={builtupStyle} className={'legend-icon high '}></span>
-          High percentage of buit-up area</li>,
-        <li>
-          <span style={builtupStyle} className={'legend-icon mid '}></span>
-          Medium percentage of buit-up area</li>,
-        <li>
-          <span style={builtupStyle} className={'legend-icon low '}></span>
-          Low percentage of buit-up area</li>
-      )
+      if (this.props.zoom > 13) {
+        legendEntries.push(
+          <li>
+            <span
+              style={aggregatedStyle}
+              className={'legend-icon feature '+featureType} />
+            {featureTypeDescription}
+          </li>,
+          <li>
+            <span
+              style={builtupStyle}
+              className={'legend-icon feature '+featureType} />
+            built-up area
+          </li>
+        )
+      } else {
+        legendEntries.push(
+          <li>
+            <span style={aggregatedStyle} className={'legend-icon high '+featureType}></span>
+            High density of {featureTypeDescription.toLowerCase()}</li>,
+          <li>
+            <span style={aggregatedStyle} className={'legend-icon mid '+featureType}></span>
+            Medium density of {featureTypeDescription.toLowerCase()}</li>,
+          <li>
+            <span style={aggregatedStyle} className={'legend-icon low '+featureType}></span>
+            Low density of {featureTypeDescription.toLowerCase()}</li>
+        )
+        legendEntries.push(
+          <li>
+            <span style={builtupStyle} className={'legend-icon high '}></span>
+            High percentage of buit-up area</li>,
+          <li>
+            <span style={builtupStyle} className={'legend-icon mid '}></span>
+            Medium percentage of buit-up area</li>,
+          <li>
+            <span style={builtupStyle} className={'legend-icon low '}></span>
+            Low percentage of buit-up area</li>
+        )
+      }
     }
     return (
       <ul id="legend" style={themes[theme].legend}>
