@@ -9,7 +9,7 @@ var merc = new Sphericalmercator({size: 512})
 var cache = {} // todo: cache invalidation
 
 function fetch(region, callback) {
-  const zoom = getRegionZoom(region)
+  const zoom = Math.max(12, getRegionZoom(region))
   const tiles = getRegionTiles(region, zoom)
   const cachePage = 'builtup'
   if (!cache[cachePage]) cache[cachePage] = {}
