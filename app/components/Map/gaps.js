@@ -145,7 +145,7 @@ class GapsMap extends Component {
     // add glLayers if map state is already initialized
     glCompareLayers.left//.addTo(map)
     glCompareLayers.right//.addTo(map)
-    this.swiperMoved(window.innerWidth/2)
+    //this.swiperMoved(window.innerWidth/2)
 
     // init from route params
     if (this.props.view) {

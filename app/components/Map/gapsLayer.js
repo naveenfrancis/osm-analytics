@@ -1,14 +1,9 @@
-import * as request from 'superagent'
-import vt from 'vector-tile'
-import Protobuf from 'pbf'
-import turf from 'turf'
-import { extent, intersect, bboxPolygon, featurecollection, centroid, lineDistance, within } from 'turf'
-import Sphericalmercator from 'sphericalmercator'
 import { queue } from 'd3-queue'
+import loadTile from './loadVectorTile.js'
 import settings from '../../settings/settings'
 
 export default L.GridLayer.extend({
-  createTile: function (coords, done) {
+  createTile: function(coords, done) {
     var tile = document.createElement('canvas')
 
     var tileSize = this.getTileSize()
@@ -18,12 +13,10 @@ export default L.GridLayer.extend({
 
     var ctx = tile.getContext('2d')
 
-    // Draw whatever is needed in the canvas context
-    // For example, circles which get bigger as we zoom in
-    //
     var q = queue()
-    q.defer(loadTile, 'http://129.206.7.145:7778/{z}/{x}/{y}.pbf', 'buildup', coords)
-    q.defer(loadTile, settings['vt-source']+'/buildings/{z}/{x}/{y}.pbf', 'osm', coords)
+    var tileCoords = { x: coords.x, y: coords.y, z: coords.z-1 }
+    q.defer(loadTile, 'http://129.206.7.145:7778/{z}/{x}/{y}.pbf', 'buildup', tileCoords)
+    q.defer(loadTile, settings['vt-source']+'/buildings/{z}/{x}/{y}.pbf', 'osm', tileCoords)
     q.awaitAll((err, data) => {
       if (err) return done(err);
       var areas = {}
@@ -68,6 +61,15 @@ export default L.GridLayer.extend({
           case ratio >= 0:
             ctx.fillStyle = "rgba(26,152,80, "+opacity+")"
             break;
+          /*case ratio > 0.1:
+            ctx.fillStyle = "rgba(26,152,80, "+opacity+")"
+            break;
+          case ratio > 0:
+            ctx.fillStyle = "#770077"
+            break;
+          case ratio == 0:
+            ctx.fillStyle = "#ff0077"
+            break;*/
           default:
             ctx.fillStyle = "#000000"
         }
@@ -79,55 +81,3 @@ export default L.GridLayer.extend({
     return tile
   }
 })
-
-
-function parseTile(data, layerName, tile, callback) {
-  const layer = data.layers[layerName]
-  var features = []
-  if (layer) {
-    for (let i=0; i<layer.length; i++) {
-      let feature = layer.feature(i)
-      features.push(feature.toGeoJSON(tile.x, tile.y, tile.z-1))
-    }
-  }
-  callback(null, featurecollection(features))
-}
-function loadTile(url, layerName, tile, callback) {
-  // based on https://github.com/mapbox/mapbox-gl-js/blob/master/js/source/worker.js
-  //var url = 'http://129.206.7.145:7778/'+tile.z+'/'+tile.x+'/'+tile.y+'.pbf'
-  url = url
-    .replace('{z}', tile.z-1)
-    .replace('{x}', tile.x)
-    .replace('{y}', tile.y)
-
-  getArrayBuffer(url, function done(err, data) {
-    if (err) return callback(err)
-    if (data === null) return callback(null, featurecollection([]))
-    data = new vt.VectorTile(new Protobuf(new Uint8Array(data)))
-    parseTile(data, layerName, tile, callback)
-  })
-}
-function getArrayBuffer(url, callback) {
-  // todo: global?
-  request.parse['application/x-protobuf'] = obj => obj
-  request.parse['application/octet-stream'] = obj => obj
-
-  /* eslint-disable indent */
-  request.get(url)
-  .on('request', function () {
-    // todo: needed?
-    // todo: check browser compat?? xhr2??? see https://github.com/visionmedia/superagent/pull/393 + https://github.com/visionmedia/superagent/pull/566
-    this.xhr.responseType = 'arraybuffer' // or blob
-  })
-  .end(function(err,res) {
-    // now res.body is an arraybuffer or a blob
-    if (!err && res.status >= 200 && res.status < 300) {
-      callback(null, res.body)
-    } else if (res && res.status === 404) {
-      callback(null, null)
-    } else {
-      callback(err || new Error(res.status))
-    }
-  });
-  /* eslint-enable indent */
-};
