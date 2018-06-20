@@ -67,9 +67,8 @@ button.filter {
 .countryView,
 .compareView,
 .gaps-regionView {
-  .leaflet-bottom {
-    margin-bottom: 212px;
-  }
+  .leaflet-bottom,
+  .slider-box,
   #legend {
     margin-bottom: 212px;
   }

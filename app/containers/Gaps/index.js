@@ -36,6 +36,7 @@ class Gaps extends Component {
           region={routeParams.region}
           filters={routeParams.filters}
           view={route.view}
+          defaultThreshold="1000"
           embed={embed}
           theme={theme}
         />

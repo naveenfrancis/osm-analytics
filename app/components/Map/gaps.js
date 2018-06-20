@@ -5,6 +5,7 @@ import Swiper from './swiper'
 import GapsFilterButton from '../FilterButton/gaps.js'
 import SearchBox from '../SearchBox'
 import GapsLegend from '../Legend/gaps.js'
+import ThresholdSelector from '../ThresholdSelector'
 import DropdownButton from '../DropdownButton'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
@@ -97,6 +98,12 @@ class GapsMap extends Component {
           zoom={this.state.mapZoomLevel}
           showHighlighted={embed === false && !!this.props.stats.timeFilter}
           theme={theme}
+        />
+        <ThresholdSelector
+          min="1"
+          max="50000"
+          defaultThreshold="10000"
+          thresholdChanged={::this.setThreshold}
         />
       </div>
     )
@@ -228,6 +235,18 @@ class GapsMap extends Component {
       }
     }
   }
+
+  setThreshold(newThreshold) {
+    this.setState({threshold: newThreshold})
+    this.refreshGapsLayer(newThreshold)
+  }
+
+  _refreshGapsLayer(newThreshold) {
+    gapsLayer.threshold = newThreshold
+    gapsLayer.redraw()
+  }
+  refreshGapsLayer = debounce(this._refreshGapsLayer, 200)
+
 
   setViewportRegion() {
     var pixelBounds = map.getPixelBounds()

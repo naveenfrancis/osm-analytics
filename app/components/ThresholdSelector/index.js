@@ -1,0 +1,33 @@
+import React, { Component } from 'react'
+import style from './style.css'
+
+class ThresholdSelector extends Component {
+  state = {
+    threshold: undefined
+  }
+
+  render() {
+    return (
+      <div className="slider-box">
+        <h3>Choose sensitivity</h3>
+        <span>high</span> <input
+          type="range"
+          min={this.props.min}
+          max={this.props.max}
+          step="any"
+          defaultValue={this.props.defaultThreshold}
+          onChange={::this.handleChange}
+        /> <span>low</span>
+      </div>
+    )
+  }
+
+  handleChange(event) {
+    const newThreshold = event.target.value
+    this.setState({threshold: newThreshold})
+    this.props.thresholdChanged(newThreshold)
+  }
+
+}
+
+export default ThresholdSelector

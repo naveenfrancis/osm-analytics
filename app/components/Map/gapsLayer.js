@@ -3,6 +3,8 @@ import loadTile from './loadVectorTile.js'
 import settings from '../../settings/settings'
 
 export default L.GridLayer.extend({
+  threshold: 1000, // ~1000m² per building
+
   createTile: function(coords, done) {
     var tile = document.createElement('canvas')
 
@@ -37,7 +39,7 @@ export default L.GridLayer.extend({
         var binX = +bin.split('/')[0]
         var binY = +bin.split('/')[1]
         var opacity = 0.4 + Math.min(0.4, Math.max((areas[bin] || 0), (counts[bin] * 1000 /*~1000m² per building*/ || 0)) / (5000 * Math.pow(2.9, 12-coords.z)))
-        var ratio = (areas[bin] || 0) / (counts[bin] * 1000 /*~1000m² per building*/ || 0)
+        var ratio = (areas[bin] || 0) / (counts[bin] * this.threshold || 0)
         var color
         switch (true) {
           case ratio > 15:
