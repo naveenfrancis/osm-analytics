@@ -241,11 +241,10 @@ class GapsMap extends Component {
     this.refreshGapsLayer(newThreshold)
   }
 
-  _refreshGapsLayer(newThreshold) {
+  refreshGapsLayer = debounce((newThreshold) => {
     gapsLayer.threshold = newThreshold
     gapsLayer.redraw()
-  }
-  refreshGapsLayer = debounce(this._refreshGapsLayer, 200)
+  }, 300)
 
 
   setViewportRegion() {
