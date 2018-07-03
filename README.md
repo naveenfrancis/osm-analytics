@@ -1,11 +1,11 @@
-osm-analytics: data analyis tool frontend
+osm-analytics: data analysis tool frontend
 =========================================
 
 [![Join the chat at https://gitter.im/hotosm/osm-analytics](https://badges.gitter.im/hotosm/osm-analytics.svg)](https://gitter.im/hotosm/osm-analytics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 OSM-Analytics lets you analyse interactively how specific OpenStreetMap features are mapped in a specific region.
 
-Say, you'd like to know when most of a specific feature type (e.g. buildings) in a specifiy country or city were added. This tool lets you select the geographical region of interest and shows a graph of the mapping activity in the region. You can even select a specific time interval to get the number of touched features in that period, and the map will highlight the matching features. Alternatively, one can view the distribution of features by their mapper's user experience. The tool also gives a side by side comparison of the map state at different points in time and lets you view which [HOT](https://hotosm.org/) projects may have includenced the mapping of a region.
+Say, you'd like to know when most of a specific feature type (e.g. buildings) in a specific country or city were added. This tool lets you select the geographical region of interest and shows a graph of the mapping activity in the region. You can even select a specific time interval to get the number of touched features in that period, and the map will highlight the matching features. Alternatively, one can view the distribution of features by their mapper's user experience. The tool also gives a side by side comparison of the map state at different points in time and lets you view which [HOT](https://hotosm.org/) projects may have included the mapping of a region.
 
 Features
 --------
