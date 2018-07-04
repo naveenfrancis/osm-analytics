@@ -4,7 +4,6 @@ import { createHashHistory } from 'history'
 import polyline from 'polyline'
 
 import {
-  filters as filterOptions,
   overlays as overlayOptions,
   compareTimes as timeOptions
 } from '../settings/options'
@@ -60,11 +59,7 @@ export default handleActions({
     if (action.payload === undefined) return state
     return Object.assign({}, state, {
       filters: action.payload !== 'none'
-        ? action.payload.split(',').filter(filter =>
-            filterOptions.some(filterOption =>
-              filterOption.id === filter
-            )
-          )
+        ? action.payload.split(',')
         : []
     })
   },

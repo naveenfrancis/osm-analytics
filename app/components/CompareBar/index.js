@@ -20,6 +20,7 @@ class CompareBar extends Component {
   }
 
   render() {
+    const activeLayer = this.props.layers.find(layer => layer.name === this.props.map.filters[0])
 
     return (
       <div id="compare" className={this.state.updating ? 'updating' : ''}>
@@ -28,7 +29,7 @@ class CompareBar extends Component {
           <p>{this.props.map.times[0]}</p>
         </li>
         {this.props.map.filters.filter(filter => this.state.featureCounts[filter]).map(filter => {
-          return (<li key={filter} title={filterOptions.find(f => f.id === filter).altText}>
+          return (<li key={activeLayer.name} title={activeLayer.description}>
             <span className="number">{
               numberWithCommas(
                 (filter === 'highways' || filter === 'waterways' ? unitSystems[this.props.stats.unitSystem].distance.convert : x=>x)(

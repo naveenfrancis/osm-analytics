@@ -35,83 +35,33 @@
       height: 8px;
       margin-right: 4px;
 
-      &.buildings {
-
-        &.feature {
-          border-style: solid;
-          border-width: 1px;
-          transform: translateX(-2px) rotate(24deg);
-        }
-        &.high {
-          opacity: 1.0;
-        }
-        &.mid {
-          opacity: 0.55;
-        }
-        &.low {
-          opacity: 0.1;
-        }
+      &.high {
+        opacity: 1.0;
+      }
+      &.mid {
+        opacity: 0.55;
+      }
+      &.low {
+        opacity: 0.1;
       }
 
-      &.highways {
-        &.feature {
-          background-color: transparent;
-          border-style: solid;
-          border-width: 2px;
-          border-top-width: 0;
-          border-left-width: 0;
-          transform: translateX(-2px) rotate(-20deg);
-        }
-        &.high {
-          opacity: 1.0;
-        }
-        &.mid {
-          opacity: 0.55;
-        }
-        &.low {
-          opacity: 0.1;
-        }
-      }
-
-      &.waterways {
-        &.feature {
-          background-color: transparent;
-          border-style: solid;
-          border-width: 2px;
-          border-top-width: 0;
-          border-left-width: 0;
-          transform: translateX(-2px) rotate(-20deg);
-        }
-        &.high {
-          opacity: 1.0;
-        }
-        &.mid {
-          opacity: 0.55;
-        }
-        &.low {
-          opacity: 0.1;
-        }
-      }
-
-      &.pois {
-        &.feature {
-          border-radius: 4px;
-        }
-        &.high {
-          opacity: 1.0;
-        }
-        &.mid {
-          opacity: 0.55;
-        }
-        &.low {
-          opacity: 0.1;
-        }
-      }
-
-      &.hot-projects {
-        border-color: #3388FF;
-        border-width: 2px;
+      &.fill.feature {
         border-style: solid;
+        border-width: 1px;
+        transform: translateX(-2px) rotate(24deg);
+      }
+
+      &.line.feature {
+        background-color: transparent;
+        border-style: solid;
+        border-width: 2px;
+        border-top-width: 0;
+        border-left-width: 0;
+        transform: translateX(-2px) rotate(-20deg);
+      }
+
+      &.circle.feature {
+        border-radius: 4px;
       }
     }
   }

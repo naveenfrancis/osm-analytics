@@ -1,31 +1,5 @@
-import themeBuildings from './templates/buildings'
-import themeHighways from './templates/highways'
-import themePois from './templates/pois'
-import themeWaterways from './templates/waterways'
-
 const blue = '#8DCCFD'
 const UIBlue = '#1477c9'
-
-const buildings = {
-  aggregatedFill: blue,
-  highlightFill: blue,
-  outline: blue
-}
-
-const highways = {
-  aggregatedFill: blue,
-  highlightFill: blue
-}
-
-const pois = {
-  aggregatedFill: blue,
-  highlightFill: blue
-}
-
-const waterways = {
-  aggregatedFill: blue,
-  hightlightFill: blue
-}
 
 const baseButton = {
   backgroundColor: 'transparent',
@@ -90,15 +64,50 @@ export default {
     }
   },
 
-  styles: {
-    buildings,
-    highways,
-    pois,
-    waterways
-  },
-
-  buildings: themeBuildings(buildings),
-  highways: themeHighways(highways),
-  pois: themePois(pois),
-  waterways: themeWaterways(waterways)
+  layerStyles: {
+    buildings: {
+      "raw": {
+        "fill-color": blue,
+        "fill-outline-color": blue
+      },
+      "raw-highlight": {
+        "fill-color": blue,
+        "fill-outline-color": blue
+      },
+      "aggregated": {
+        "fill-color": blue
+      },
+      "aggregated-highlight": {
+        "fill-color": blue
+      }
+    },
+    highways: {
+      "raw": {
+        "line-color": blue
+      },
+      "raw-highlight": {
+        "line-color": blue
+      },
+      "aggregated": {
+        "line-color": blue
+      },
+      "aggregated-highlight": {
+        "line-color": blue
+      }
+    },
+    waterways: {
+      "raw": {
+        "line-color": blue
+      },
+      "raw-highlight": {
+        "line-color": blue
+      },
+      "aggregated": {
+        "line-color": blue
+      },
+      "aggregated-highlight": {
+        "line-color": blue
+      }
+    }
+  }
 }

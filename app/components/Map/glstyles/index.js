@@ -1,57 +1,143 @@
 /* eslint quotes: "off" */
 
-import buildings from './buildings.json'
-import highways from './highways.json'
-import waterways from './waterways.json'
-import pois from './pois.json'
-
 import settings from '../../../settings/settings'
-import { filters as filterOptions } from '../../../settings/options'
 import themes from '../../../settings/themes'
 
-const applyTheme = (themeName, style) => {
-  return !themes[themeName]
-    ? style
-    : Object.assign(style, {
-      layers: style.layers.map(layer =>
-        Object.assign(layer, {
-          paint: (themes[themeName][style.name]
-            .filter(th => th.id === layer.id)[0] || layer)
-            .paint
-        })
+const applyTheme = (themeName, layer, glLayers) => {
+  //if (!themes[themeName] || !themes[themeName][layerName]) return glLayers
+  return glLayers.map(glLayer =>
+    Object.assign(glLayer, {
+      paint: Object.assign(glLayer.paint,
+        themes[themeName].getGlLayerStyle(layer, glLayer)
       )
     })
+  )
 }
 
-export default function getStyle(filters, options) {
+export default function getStyle(availableLayers, activeLayer, options) {
   if (!options) options = {}
   const currentTheme = options.theme || 'default'
   const timeFilter = options.timeFilter
   const experienceFilter = options.experienceFilter
   const server = options.source || settings['vt-source']
 
-  const filterStyles = {
-    buildings: applyTheme(currentTheme, buildings),
-    highways: applyTheme(currentTheme, highways),
-    waterways: applyTheme(currentTheme, waterways),
-    pois: applyTheme(currentTheme, pois),
-  }
-
-  var allSources = {}
-  filterOptions.forEach(filterOption => {
-    let style = filterOption.id
-    if (!filterStyles[style]) throw new Error('gl style undefined for feature type ', filterOption)
-    Object.keys(filterStyles[style].sources).forEach(source => {
-      allSources[source] = JSON.parse(JSON.stringify(filterStyles[style].sources[source]))
-      allSources[source].tiles[0] = allSources[source].tiles[0].replace('{{server}}', server)
-    })
+  var glSources = {}
+  availableLayers.forEach(layer => {
+    glSources[layer.name + '-raw'] = {
+      "type": "vector",
+      "tiles": [
+        server+"/"+layer.name+"/{z}/{x}/{y}.pbf"
+      ],
+      "minzoom": 13,
+      "maxzoom": 13
+    }
+    glSources[layer.name + '-aggregated'] = {
+      "type": "vector",
+      "tiles": [
+        server+"/"+layer.name+"/{z}/{x}/{y}.pbf"
+      ],
+      "minzoom": 0,
+      "maxzoom": 12
+    }
   })
+
+  var glLayers = []
+  if (activeLayer !== undefined) {
+    // raw layers
+    glLayers.push({
+      "id": activeLayer.name + "-raw",
+      "source": activeLayer.name + "-raw",
+      "source-layer": "osm",
+      "type": activeLayer.render.type,
+      "paint": activeLayer.render.type === "line" ? {
+          "line-opacity": 1,
+          "line-width": 1
+        } : {
+          "fill-opacity": 1
+        }
+    })
+    glLayers.push({
+      "id": activeLayer.name + "-raw-highlight",
+      "source": activeLayer.name + "-raw",
+      "source-layer": "osm",
+      "filter": ["==", "_timestamp", -1],
+      "type": activeLayer.render.type,
+      "paint": activeLayer.render.type === "line" ? {
+          "line-opacity": 1,
+          "line-width": 2
+        } : {
+          "fill-opacity": 1
+        }
+    })
+
+    // aggregated layers
+    var zoomBreaks = [Infinity]
+    // contains list of breaks for different zoom level layers
+    // e.g. 0, 50, 200, 800, 3200, 12800, 51200
+    var scaleFactor = activeLayer.render.scaleFactor
+    for (var i=0; i<6; i++) {
+      zoomBreaks.unshift(scaleFactor)
+      scaleFactor /= activeLayer.render.scaleBasis
+    }
+    zoomBreaks.unshift(0)
+
+    const opacityBreaks = [
+      [[10, 0.1], [13, 1.0]],
+      [[8, 0.1], [11, 1.0], [12, 1.0]],
+      [[6, 0.1], [9, 1.0], [12, 1.0]],
+      [[4, 0.1], [7, 1.0], [12, 1.0]],
+      [[2, 0.1], [5, 1.0], [12, 1.0]],
+      [[0, 0.1], [3, 1.0], [12, 1.0]],
+      [[0, 1.0], [12, 1.0]]
+    ]
+    const filterField = activeLayer.filter.geometry === "LineString"
+      ? "_lineDistance"
+      : "_count"
+    zoomBreaks.slice(0, -1).forEach((_, i) => {
+      glLayers.push({
+        "id": activeLayer.name + "-aggregated-"+i,
+        "source": activeLayer.name + "-aggregated",
+        "source-layer": "osm",
+        "maxzoom": 12.01,
+        "filter": ["all",
+          [">=", filterField, zoomBreaks[i]],
+          ["<", filterField, zoomBreaks[i+1]]
+        ],
+        "type": "fill",
+        "paint": {
+          "fill-antialias": false,
+          "fill-opacity": {
+            base: 1,
+            stops: opacityBreaks[i]
+          }
+        }
+      })
+      glLayers.push({
+        "id": activeLayer.name + "-aggregated-highlight-"+i,
+        "source": activeLayer.name + "-aggregated",
+        "source-layer": "osm",
+        "maxzoom": 12.01,
+        "filter": ["==", "_timestamp", -1],
+        "densityFilter": ["all",
+          [">=", filterField, zoomBreaks[i]],
+          ["<", filterField, zoomBreaks[i+1]]
+        ],
+        "type": "fill",
+        "paint": {
+          "fill-antialias": false,
+          "fill-opacity": {
+            base: 1,
+            stops: opacityBreaks[i]
+          }
+        }
+      })
+    })
+  }
 
   return {
     "version": 8,
-    "sources": allSources,
-    "layers": filters
-      .map(filter => filterStyles[filter].layers.map(layer => {
+    "sources": glSources,
+    "layers": applyTheme(currentTheme, activeLayer, glLayers).map(layer => {
         if (!layer.id.match(/highlight/)) return layer
         if (!timeFilter && !experienceFilter) {
           layer.filter = ["==", "_timestamp", -1]
@@ -70,7 +156,7 @@ export default function getStyle(filters, options) {
         }
 
         return layer
-      }))
+      })
       .reduce((prev, filterSources) => prev.concat(filterSources), [])
       .sort((a,b) => {
         if (a.id.match(/highlight/) && b.id.match(/highlight/)) return 0
@@ -79,17 +165,14 @@ export default function getStyle(filters, options) {
         return 0
       })
   }
-  buildings,
-  highways,
-  waterways
 }
 
-export function getCompareStyles(filters, compareTimes, theme) {
+export function getCompareStyles(availableLayers, activeLayer, compareTimes, theme) {
   const beforeSource = (compareTimes[0] === 'now') ? settings['vt-source'] : settings['vt-hist-source']+'/'+compareTimes[0]
   const afterSource = (compareTimes[1] === 'now') ? settings['vt-source'] : settings['vt-hist-source']+'/'+compareTimes[1]
   var glCompareLayerStyles = {
-    before: JSON.parse(JSON.stringify(getStyle(filters, { source: beforeSource, theme }))),
-    after: JSON.parse(JSON.stringify(getStyle(filters, { source: afterSource, theme })))
+    before: JSON.parse(JSON.stringify(getStyle(availableLayers, activeLayer, { source: beforeSource, theme }))),
+    after: JSON.parse(JSON.stringify(getStyle(availableLayers, activeLayer, { source: afterSource, theme })))
   }
   // don't need highlight layers
   glCompareLayerStyles.before.layers = glCompareLayerStyles.before.layers.filter(layer => !layer.source.match(/highlight/))

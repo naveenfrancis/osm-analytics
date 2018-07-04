@@ -9,11 +9,13 @@ import Stats from '../../components/Stats'
 import CompareBar from '../../components/CompareBar'
 import { load as loadHotProjects } from '../../data/hotprojects.js'
 import themes from '../../settings/themes'
+import { loadLayers } from '../../settings/options'
 import style from './style.css'
 
 class App extends Component {
   state = {
-    hotProjectsLoaded: false
+    hotProjectsLoaded: false,
+    layersLoaded: false
   }
 
   render() {
@@ -21,19 +23,20 @@ class App extends Component {
     const theme = routeParams.theme || 'default'
     const header = (embed) ? <EmbedHeader {...actions} theme={theme}/> : <Header/>
 
-    if (!this.state.hotProjectsLoaded) {
+    if (!this.state.hotProjectsLoaded || !this.state.layersLoaded) {
       return (
         <div className="main">
           {header}
+          <p style={{ textAlign: "center", marginTop: "100px" }}>Loading…</p>
         </div>
       )
-      return <p style="text-align:center;">Loading…</p>
     }
 
     return (
       <div className="main">
         {header}
         <Map
+          layers={this.state.layers}
           region={routeParams.region}
           filters={routeParams.filters}
           overlay={routeParams.overlay}
@@ -42,8 +45,8 @@ class App extends Component {
           embed={embed}
           theme={theme}
         />
-        {route.view === 'country' ? <Stats mode={routeParams.overlay}/> : ''}
-        {route.view === 'compare' && embed === false ? <CompareBar times={routeParams.times}/> : ''}
+        {route.view === 'country' ? <Stats layers={this.state.layers} mode={routeParams.overlay}/> : ''}
+        {route.view === 'compare' && embed === false ? <CompareBar layers={this.state.layers} times={routeParams.times}/> : ''}
         { embed ? <a className="external-link" target='_blank' rel='noreferrer noopener' style={themes[theme].externalLink} href='http://osm-analytics.org/'>View on osm-analytics.org</a> : '' }
       </div>
     )
@@ -54,9 +57,18 @@ class App extends Component {
     this.props.actions.setThemeFromUrl(this.props.routeParams.theme)
     loadHotProjects((err) => {
       if (err) {
-        console.error('unable to load hot projects data: ', err)
+        return console.error('unable to load hot projects data: ', err)
       }
       this.setState({ hotProjectsLoaded: true })
+    })
+    loadLayers((err, layers) => {
+      if (err) {
+        return console.error('unable to load available osm-analytics layers: ', err)
+      }
+      this.setState({
+        layersLoaded: true,
+        layers
+      })
     })
   }
 }

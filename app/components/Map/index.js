@@ -29,7 +29,8 @@ class Map extends Component {
 
   render() {
     const { view, actions, embed, theme } = this.props
-    const containerClassName = (embed === false) ? `${view}View` : '';
+    const containerClassName = (embed === false) ? `${view}View` : ''
+    const activeLayer = this.props.layers.find(layer => layer.name === this.props.map.filters[0])
     return (
       <div className={containerClassName}>
         <div id="map" style={embed ? { bottom: 30 } : {}}>
@@ -43,11 +44,15 @@ class Map extends Component {
           <SearchBox className="searchbox" selectedRegion={this.props.map.region} {...actions}/>
           <span className="search-alternative">or</span>
           <button className="outline" onClick={::this.setViewportRegion}>Outline Custom Area</button>
-          <FilterButton enabledFilters={this.props.map.filters} {...actions}/>
+          <FilterButton
+            layers={this.props.layers}
+            enabledFilters={this.props.map.filters}
+            {...actions}
+          />
         </div>}
 
         <Legend
-          featureType={this.props.map.filters[0]}
+          layer={activeLayer}
           zoom={this.state.mapZoomLevel}
           showHighlighted={embed === false && !!this.props.stats.timeFilter}
           theme={theme}
@@ -57,8 +62,9 @@ class Map extends Component {
   }
 
   componentDidMount() {
+    const { theme, embed, layers } = this.props
 
-    const { theme, embed } = this.props
+    const activeLayer = layers.find(layer => layer.name === this.props.map.filters[0])
 
     map = L.map(
       'map', {
@@ -81,11 +87,11 @@ class Map extends Component {
     }
     glLayer = L.mapboxGL({
       updateInterval: 0,
-      style: glStyles(this.props.map.filters, { theme }),
+      style: glStyles(layers, activeLayer, { theme }),
       hash: false
     })
 
-    const glCompareLayerStyles = getCompareStyles(this.props.map.filters, this.props.map.times, theme)
+    const glCompareLayerStyles = getCompareStyles(layers, activeLayer, this.props.map.times, theme)
     glCompareLayers = {
       before: L.mapboxGL({
         updateInterval: 0,
@@ -127,7 +133,7 @@ class Map extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { theme } = this.props
+    const { theme, layers } = this.props
 
     // ceck for changed url parameters
     if (nextProps.region !== this.props.region) {
@@ -152,18 +158,19 @@ class Map extends Component {
     if (nextProps.map.region !== this.props.map.region) {
       this.mapSetRegion(nextProps.map.region, nextProps.embed === false, nextProps.embed === false)
     }
+    const nextActiveLayer = layers.find(layer => layer.name === nextProps.map.filters[0])
     if (nextProps.map.filters.join() !== this.props.map.filters.join()) { // todo: handle this in reducer?
-      glLayer.setStyle(glStyles(nextProps.map.filters, {
+      glLayer.setStyle(glStyles(layers, nextActiveLayer, {
         timeFilter: nextProps.stats.timeFilter,
         experienceFilter: nextProps.stats.experienceFilter,
         theme
       }))
-      let glCompareLayerStyles = getCompareStyles(nextProps.map.filters, nextProps.map.times, theme)
+      let glCompareLayerStyles = getCompareStyles(layers, nextActiveLayer, nextProps.map.times, theme)
       glCompareLayers.before.setStyle(glCompareLayerStyles.before)
       glCompareLayers.after.setStyle(glCompareLayerStyles.after)
     }
     if (nextProps.map.times !== this.props.map.times) {
-      let glCompareLayerStyles = getCompareStyles(nextProps.map.filters, nextProps.map.times, theme)
+      let glCompareLayerStyles = getCompareStyles(layers, nextActiveLayer, nextProps.map.times, theme)
       if (nextProps.map.times[0] !== this.props.map.times[0]) {
         glCompareLayers.before.setStyle(glCompareLayerStyles.before)
       }
@@ -275,9 +282,10 @@ class Map extends Component {
   }
 
   setTimeFilter(timeFilter) {
-    const { theme } = this.props
+    const { theme, layers } = this.props
 
-    const highlightLayers = glStyles(this.props.map.filters, { theme }).layers.filter(l => l.id.match(/highlight/))
+    const activeLayer = layers.find(layer => layer.name === this.props.map.filters[0])
+    const highlightLayers = glStyles(layers, activeLayer, { theme }).layers.filter(l => l.id.match(/highlight/))
     if (timeFilter === null) {
       // reset time filter
       highlightLayers.forEach(highlightLayer => {
@@ -307,8 +315,10 @@ class Map extends Component {
   }
 
   setExperienceFilter(experienceFilter) {
-    const { theme } = this.props
-    const highlightLayers = glStyles(this.props.map.filters, { theme }).layers.map(l => l.id).filter(id => id.match(/highlight/))
+    const { theme, layers } = this.props
+
+    const activeLayer = layers.find(layer => layer.name === this.props.map.filters[0])
+    const highlightLayers = glStyles(layers, activeLayer, { theme }).layers.map(l => l.id).filter(id => id.match(/highlight/))
     if (experienceFilter === null) {
       // reset time filter
       highlightLayers.forEach(highlightLayer => {
