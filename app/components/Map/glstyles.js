@@ -1,7 +1,7 @@
 /* eslint quotes: "off" */
 
-import settings from '../../../settings/settings'
-import themes from '../../../settings/themes'
+import settings from '../../settings/settings'
+import themes from '../../settings/themes'
 
 const applyTheme = (themeName, layer, glLayers) => {
   //if (!themes[themeName] || !themes[themeName][layerName]) return glLayers
@@ -71,7 +71,7 @@ export default function getStyle(availableLayers, activeLayer, options) {
     })
 
     // aggregated layers
-    var zoomBreaks = [Infinity]
+    var zoomBreaks = [1E99]
     // contains list of breaks for different zoom level layers
     // e.g. 0, 50, 200, 800, 3200, 12800, 51200
     var scaleFactor = activeLayer.render.scaleFactor

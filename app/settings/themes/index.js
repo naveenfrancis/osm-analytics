@@ -6,7 +6,7 @@ const themePrototype = {
     if (this.layerStyles[layer.name] !== undefined)
       return this.layerStyles[layer.name]
     else
-      return layer.render.defaultStyle
+      return layer.render.defaultStyle || { "raw": {}, "raw-highlight": {}, "aggregated": {}, "aggregated-highlight": {} }
   },
   getGlLayerStyle: function(layer, glLayer) {
     const style = this.getStyle(layer)
