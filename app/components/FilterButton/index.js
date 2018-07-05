@@ -1,14 +1,13 @@
 import React, { Component } from 'react'
 import DropdownButton from '../DropdownButton'
-import { filters } from '../../settings/options'
 
 
 class FilterButton extends Component {
   render() {
-    var btn = <button className='filter' title='Select Map Features'>{filters.find(filter => filter.id === this.props.enabledFilters[0]).description}&ensp;▾</button>
+    var btn = <button className='filter' title='Select Map Features'>{this.props.layers.find(layer => layer.name === this.props.enabledFilters[0]).title}&ensp;▾</button>
     return (
       <DropdownButton
-        options={filters.filter(f => !f.hidden)}
+        options={this.props.layers.map(layer => ({ id: layer.name, description: layer.title }))}
         btnElement={btn}
         multiple={false}
         selectedKeys={this.props.enabledFilters}

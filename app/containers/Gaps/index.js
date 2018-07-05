@@ -33,6 +33,7 @@ class Gaps extends Component {
       <div className="main">
         {header}
         <GapsMap
+          layers={this.state.layers}
           region={routeParams.region}
           filters={routeParams.filters}
           view={route.view}

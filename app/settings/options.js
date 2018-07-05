@@ -1,26 +1,14 @@
-export const filters = [
-  {
-    id: 'buildings',
-    description: 'Buildings',
-    altText: 'Polygons with a building=* tag'
-  },
-  {
-    id: 'highways',
-    description: 'Roads',
-    altText: 'Lines with a highway=* tag (highways & roads, but also tracks and paths)'
-  },
-  {
-    id: 'waterways',
-    description: 'Rivers',
-    altText: 'Lines with a waterway=* tag (waterways, rivers & streams)'
-  },
-  {
-    id: 'pois',
-    description: 'POIs',
-    altText: 'Points with an amenity=* tag (e.g. schools, restaurants,  places of worship, drinking water, banks, fuel stations, etc.)',
-    hidden: true
-  }
-]
+import settings from './settings'
+import * as request from 'superagent'
+
+export function loadLayers(callback) {
+  request
+  .get(settings['vt-source'] + '/analytics.json')
+  .end(function(err, res) {
+    if (err) return callback(err)
+    callback(null, res.body.layers)
+  })
+}
 
 export const gapsFilters = [
   {

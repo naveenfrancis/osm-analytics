@@ -4,14 +4,11 @@ import { createHashHistory } from 'history'
 import polyline from 'polyline'
 
 import {
-  filters,
-  gapsFilters,
   overlays as overlayOptions,
   compareTimes as timeOptions
 } from '../settings/options'
 import defaults from '../settings/defaults'
 
-var filterOptions = [].concat(filters).concat(gapsFilters)
 var history = createHashHistory({ queryKey: false })
 
 const initialState = {
@@ -66,11 +63,7 @@ export default handleActions({
     if (action.payload === undefined) return state
     return Object.assign({}, state, {
       filters: action.payload !== 'none'
-        ? action.payload.split(',').filter(filter =>
-            filterOptions.some(filterOption =>
-              filterOption.id === filter
-            )
-          )
+        ? action.payload.split(',')
         : []
     })
   },
