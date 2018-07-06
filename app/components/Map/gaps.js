@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import style from './style.css'
-import glStyles, { getGapsStyles } from './glstyles'
+import glStyles from './glstyles'
 import Swiper from './swiper'
 import GapsFilterButton from '../FilterButton/gaps.js'
 import SearchBox from '../SearchBox'
@@ -135,7 +135,7 @@ class GapsMap extends Component {
       alert('This browser does not support WebGL which is required to run this application. Please check that you are using a supported browser and that WebGL is enabled.')
     }
 
-    const glCompareLayerStyles = getGapsStyles(theme)
+    /*const glCompareLayerStyles = getGapsStyles(theme)
     glCompareLayers = {
       left: L.mapboxGL({
         updateInterval: 0,
@@ -153,6 +153,7 @@ class GapsMap extends Component {
     glCompareLayers.left//.addTo(map)
     glCompareLayers.right//.addTo(map)
     //this.swiperMoved(window.innerWidth/2)
+    */
 
     // init from route params
     if (this.props.view) {
