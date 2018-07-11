@@ -71,7 +71,7 @@ export default function getStyle(availableLayers, activeLayer, options) {
     var scaleFactor = activeLayer.render.scaleFactor
     for (var i=0; i<6; i++) {
       zoomBreaks.unshift(scaleFactor)
-      scaleFactor /= activeLayer.render.scaleBasis
+      scaleFactor /= Math.pow(activeLayer.render.scaleBasis, 2)
     }
     zoomBreaks.unshift(0)
 
