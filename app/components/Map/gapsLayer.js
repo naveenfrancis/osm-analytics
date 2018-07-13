@@ -1,17 +1,27 @@
 import { queue } from 'd3-queue'
+import Sphericalmercator from 'sphericalmercator'
+import { bboxPolygon, intersect, inside, centroid } from 'turf'
 import loadTile from './loadVectorTile.js'
 import settings from '../../settings/settings'
+
+const merc = new Sphericalmercator({size: 512})
+const gapsCoverageExtent = bboxPolygon([-17,-20,66,29])
 
 export default L.GridLayer.extend({
   threshold: 1000, // ~1000m² per building
 
   createTile: function(coords, done) {
     var tile = document.createElement('canvas')
-
     var tileSize = this.getTileSize()
     var cellSize = tileSize.x / 64
     tile.setAttribute('width', tileSize.x)
     tile.setAttribute('height', tileSize.y)
+
+    const bboxPoly = bboxPolygon(merc.bbox(coords.x, coords.y, coords.z-1))
+    if (!intersect(gapsCoverageExtent, bboxPoly)) {
+      setTimeout(() => done(null, tile), 1)
+      return tile
+    }
 
     var ctx = tile.getContext('2d')
 
@@ -20,16 +30,20 @@ export default L.GridLayer.extend({
     q.defer(loadTile, 'http://129.206.7.145:7778/{z}/{x}/{y}.pbf', 'buildup', tileCoords)
     q.defer(loadTile, settings['vt-source']+'/buildings/{z}/{x}/{y}.pbf', 'osm', tileCoords)
     q.awaitAll((err, data) => {
-      if (err) return done(err);
+      if (err) return done(err)
       var areas = {}
-      data[0].features.forEach(feature => {
+      data[0].features = data[0].features.filter(feature =>
+        inside(centroid(feature), gapsCoverageExtent)
+      ).forEach(feature => {
         var binX = feature.properties.binX
         var binY = feature.properties.binY
         var area = feature.properties.area
         areas[binX+'/'+binY] = area
       })
       var counts = {}
-      data[1].features.forEach(feature => {
+      data[1].features = data[1].features.filter(feature =>
+        inside(centroid(feature), gapsCoverageExtent)
+      ).forEach(feature => {
         var binX = feature.properties.binX
         var binY = feature.properties.binY
         var count = feature.properties._count
