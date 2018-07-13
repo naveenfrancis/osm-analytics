@@ -15,7 +15,6 @@ import HotProjectsModal from './hotProjectsModal'
 import regionToCoords from '../Map/regionToCoords'
 import searchHotProjectsInRegion from './searchHotProjects'
 import searchFeatures from './searchFeatures'
-import { filters } from '../../settings/options'
 import unitSystems from '../../settings/unitSystems'
 import style from './style.css'
 
@@ -52,6 +51,7 @@ class Stats extends Component {
 
   render() {
     var features = this.state.features
+    const activeLayer = this.props.layers.find(layer => layer.name === this.props.map.filters[0])
 
     // apply time and experience filters
     features.forEach(filter => {
@@ -112,7 +112,7 @@ class Stats extends Component {
             {timeFilter}
           </li>
         {features.map(filter => {
-          return (<li key={filter.filter} title={filters.find(f => f.id === filter.filter).altText}>
+          return (<li key={activeLayer.name} title={activeLayer.description}>
             <span className="number">{
               numberWithCommas(Number((filter.filter === 'highways' || filter.filter === 'waterways'
                 ? unitSystems[this.props.stats.unitSystem].distance.convert(
@@ -125,10 +125,10 @@ class Stats extends Component {
             ? <UnitSelector
                 unitSystem={this.props.stats.unitSystem}
                 unit='distance'
-                suffix={' of '+filters.find(f => f.id === filter.filter).description}
+                suffix={' of '+this.props.layers.find(f => f.name === filter.filter).title}
                 setUnitSystem={this.props.statsActions.setUnitSystem}
               />
-            : <span className="descriptor">{filters.find(f => f.id === filter.filter).description}</span>
+            : <span className="descriptor">{this.props.layers.find(f => f.name === filter.filter).title}</span>
             }
           </li>)
         })}

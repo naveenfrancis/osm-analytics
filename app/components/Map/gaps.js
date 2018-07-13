@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import style from './style.css'
-import glStyles, { getCompareStyles } from './glstyles'
+import glStyles from './glstyles'
 import Swiper from './swiper'
-import FilterButton from '../FilterButton'
+import GapsFilterButton from '../FilterButton/gaps.js'
 import SearchBox from '../SearchBox'
-import Legend from '../Legend'
+import GapsLegend from '../Legend/gaps.js'
+import ThresholdSelector from '../ThresholdSelector'
+import DropdownButton from '../DropdownButton'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import * as MapActions from '../../actions/map'
@@ -13,58 +15,103 @@ import { debounce } from 'lodash'
 import regionToCoords from './regionToCoords'
 import themes from '../../settings/themes'
 import settings from '../../settings/settings'
+import { gapsFilters } from '../../settings/options'
+import GapsLayer from './gapsLayer.js'
 
 // leaflet plugins
 import * as _leafletmapboxgljs from '../../libs/leaflet-mapbox-gl.js'
 import * as _leafleteditable from '../../libs/Leaflet.Editable.js'
 
 var map // Leaflet map object
+var backgroundLayer
+var gapsLayer
 var glLayer // mapbox-gl layer
 var glCompareLayers // mapbox-gl layers for before/after view
 var boundsLayer = null // selected region layer
 var moveDirectly = false
 
-class Map extends Component {
+var backgrounds = [
+  {
+    id: 'default',
+    description: 'plain base map',
+    url: settings['map-background-tile-layer']
+  },
+  {
+    id: 'mapbox-satellite',
+    description: 'satellite imagery (mapbox)',
+    url: 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaG90IiwiYSI6ImNpbmx4bWN6ajAwYTd3OW0ycjh3bTZvc3QifQ.KtikS4sFO95Jm8nyiOR4gQ'
+  },
+  {
+    id: 'esri-satellite',
+    description: 'satellite imagery (esri)',
+    url: 'https://server.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+  },
+  {
+    id: 'osm',
+    description: 'openstreetmap.org',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+  },
+  {
+    id: 'worldpop',
+    description: 'worldpop.org.uk',
+    url: 'http://maps.worldpop.org.uk/tilesets/wp-global-100m-ppp-2010-adj/{z}/{x}/{y}.png'
+  }
+]
+
+
+
+class GapsMap extends Component {
   state = {}
+
+  changeBackground(newLayer) {
+    backgroundLayer.setUrl(backgrounds.find(bg => bg.id === newLayer[0]).url)
+  }
 
   render() {
     const { view, actions, embed, theme } = this.props
-    const containerClassName = (embed === false) ? `${view}View` : ''
-    const activeLayer = this.props.layers.find(layer => layer.name === this.props.map.filters[0])
+    const containerClassName = (embed === false) ? `${view}View` : '';
+
+    var btn = <button className='background-selector' style={{position: 'absolute', top: '122px', right: '25px'}} title='Select Background Layer'>background map&ensp;▾</button>
+
     return (
       <div className={containerClassName}>
         <div id="map" style={embed ? { bottom: 30 } : {}}>
         </div>
-        {this.props.map.view === 'compare'
-          ? <Swiper onMoved={::this.swiperMoved} theme={themes[theme]} />
-          : ''
-        }
+        {false ? <Swiper onMoved={::this.swiperMoved} theme={themes[theme]} /> : ""}
 
         {embed === false && <div>
           <SearchBox className="searchbox" selectedRegion={this.props.map.region} {...actions}/>
           <span className="search-alternative">or</span>
           <button className="outline" onClick={::this.setViewportRegion}>Outline Custom Area</button>
-          <FilterButton
-            layers={this.props.layers}
-            enabledFilters={this.props.map.filters}
-            {...actions}
+          <GapsFilterButton enabledFilters={[gapsFilters[0].id]} {...actions}/>
+          <DropdownButton
+            options={backgrounds}
+            btnElement={btn}
+            multiple={false}
+            selectedKeys={[]}
+            onSelectionChange={::this.changeBackground}
           />
         </div>}
 
-        <Legend
-          layer={activeLayer}
+        <GapsLegend
+          featureType={this.props.map.filters[0]}
           zoom={this.state.mapZoomLevel}
           showHighlighted={embed === false && !!this.props.stats.timeFilter}
           theme={theme}
+        />
+        <ThresholdSelector
+          min="1"
+          max="50000"
+          defaultThreshold="10000"
+          thresholdChanged={::this.setThreshold}
         />
       </div>
     )
   }
 
   componentDidMount() {
-    const { theme, embed, layers } = this.props
 
-    const activeLayer = layers.find(layer => layer.name === this.props.map.filters[0])
+    const { theme, embed } = this.props
 
     map = L.map(
       'map', {
@@ -72,46 +119,41 @@ class Map extends Component {
       minZoom: 2,
       scrollWheelZoom: !embed
     })
-    .setView([0, 35], 2)
+    .setView([2, 26], 4)
     map.zoomControl.setPosition('bottomright')
     map.on('editable:editing', debounce(::this.setCustomRegion, 200))
     map.on('zoomend', (e) => { this.setState({ mapZoomLevel:map.getZoom() }) })
 
-    L.tileLayer(settings['map-background-tile-layer'], {
+    backgroundLayer = L.tileLayer(settings['map-background-tile-layer'], {
       attribution: settings['map-attribution'],
       zIndex: -1
     }).addTo(map)
 
+    gapsLayer = (new GapsLayer({tileSize: 512, maxNativeZoom: 13})).addTo(map);
+
     if (!mapboxgl.supported()) {
       alert('This browser does not support WebGL which is required to run this application. Please check that you are using a supported browser and that WebGL is enabled.')
     }
-    glLayer = L.mapboxGL({
-      updateInterval: 0,
-      style: glStyles(layers, activeLayer, { theme }),
-      hash: false
-    })
 
-    const glCompareLayerStyles = getCompareStyles(layers, activeLayer, this.props.map.times, theme)
+    /*const glCompareLayerStyles = getGapsStyles(theme)
     glCompareLayers = {
-      before: L.mapboxGL({
+      left: L.mapboxGL({
         updateInterval: 0,
-        style: glCompareLayerStyles.before,
+        style: glCompareLayerStyles.osm,
         hash: false
       }),
-      after: L.mapboxGL({
+      right: L.mapboxGL({
         updateInterval: 0,
-        style: glCompareLayerStyles.after,
+        style: glCompareLayerStyles.reference,
         hash: false
       })
     }
 
     // add glLayers if map state is already initialized
-    if (this.props.map.view === 'country' || this.props.map.view === 'default') {
-      glLayer.addTo(map)
-    } else if (this.props.map.view === 'compare') {
-      glCompareLayers.before.addTo(map)
-      glCompareLayers.after.addTo(map)
-    }
+    glCompareLayers.left//.addTo(map)
+    glCompareLayers.right//.addTo(map)
+    //this.swiperMoved(window.innerWidth/2)
+    */
 
     // init from route params
     if (this.props.view) {
@@ -124,16 +166,10 @@ class Map extends Component {
     if (this.props.filters) {
       this.props.actions.setFiltersFromUrl(this.props.filters)
     }
-    if (this.props.overlay) {
-      this.props.actions.setOverlayFromUrl(this.props.overlay)
-    }
-    if (this.props.times) {
-      this.props.actions.setTimesFromUrl(this.props.times)
-    }
   }
 
   componentWillReceiveProps(nextProps) {
-    const { theme, layers } = this.props
+    const { theme } = this.props
 
     // ceck for changed url parameters
     if (nextProps.region !== this.props.region) {
@@ -158,19 +194,18 @@ class Map extends Component {
     if (nextProps.map.region !== this.props.map.region) {
       this.mapSetRegion(nextProps.map.region, nextProps.embed === false, nextProps.embed === false)
     }
-    const nextActiveLayer = layers.find(layer => layer.name === nextProps.map.filters[0])
     if (nextProps.map.filters.join() !== this.props.map.filters.join()) { // todo: handle this in reducer?
-      glLayer.setStyle(glStyles(layers, nextActiveLayer, {
+      glLayer.setStyle(glStyles(nextProps.map.filters, {
         timeFilter: nextProps.stats.timeFilter,
         experienceFilter: nextProps.stats.experienceFilter,
         theme
       }))
-      let glCompareLayerStyles = getCompareStyles(layers, nextActiveLayer, nextProps.map.times, theme)
+      let glCompareLayerStyles = getCompareStyles(nextProps.map.filters, nextProps.map.times, theme)
       glCompareLayers.before.setStyle(glCompareLayerStyles.before)
       glCompareLayers.after.setStyle(glCompareLayerStyles.after)
     }
     if (nextProps.map.times !== this.props.map.times) {
-      let glCompareLayerStyles = getCompareStyles(layers, nextActiveLayer, nextProps.map.times, theme)
+      let glCompareLayerStyles = getCompareStyles(nextProps.map.filters, nextProps.map.times, theme)
       if (nextProps.map.times[0] !== this.props.map.times[0]) {
         glCompareLayers.before.setStyle(glCompareLayerStyles.before)
       }
@@ -201,6 +236,17 @@ class Map extends Component {
       }
     }
   }
+
+  setThreshold(newThreshold) {
+    this.setState({threshold: newThreshold})
+    this.refreshGapsLayer(newThreshold)
+  }
+
+  refreshGapsLayer = debounce((newThreshold) => {
+    gapsLayer.threshold = newThreshold
+    gapsLayer.redraw()
+  }, 300)
+
 
   setViewportRegion() {
     var pixelBounds = map.getPixelBounds()
@@ -281,67 +327,14 @@ class Map extends Component {
     });
   }
 
-  setTimeFilter(timeFilter) {
-    const { theme, layers } = this.props
-
-    const activeLayer = layers.find(layer => layer.name === this.props.map.filters[0])
-    const highlightLayers = glStyles(layers, activeLayer, { theme }).layers.filter(l => l.id.match(/highlight/))
-    if (timeFilter === null) {
-      // reset time filter
-      highlightLayers.forEach(highlightLayer => {
-        glLayer._glMap.setFilter(highlightLayer.id, ["==", "_timestamp", -1])
-      })
-    } else {
-      highlightLayers.forEach(highlightLayer => {
-        let layerFilter = ["any",
-          ["all",
-            [">=", "_timestamp", timeFilter[0]],
-            ["<=", "_timestamp", timeFilter[1]]
-          ],
-          ["all",
-            [">=", "_timestampMin", timeFilter[0]],
-            ["<=", "_timestampMax", timeFilter[1]]
-          ]
-        ]
-        if (highlightLayer.densityFilter) {
-          layerFilter = ["all",
-            highlightLayer.densityFilter,
-            layerFilter
-          ]
-        }
-        glLayer._glMap.setFilter(highlightLayer.id, layerFilter)
-      })
-    }
-  }
-
-  setExperienceFilter(experienceFilter) {
-    const { theme, layers } = this.props
-
-    const activeLayer = layers.find(layer => layer.name === this.props.map.filters[0])
-    const highlightLayers = glStyles(layers, activeLayer, { theme }).layers.map(l => l.id).filter(id => id.match(/highlight/))
-    if (experienceFilter === null) {
-      // reset time filter
-      highlightLayers.forEach(highlightLayer => {
-        glLayer._glMap.setFilter(highlightLayer, ["==", "_timestamp", -1])
-      })
-    } else {
-      highlightLayers.forEach(highlightLayer => {
-        glLayer._glMap.setFilter(highlightLayer, ["all",
-          [">=", "_userExperience", experienceFilter[0]],
-          ["<=", "_userExperience", experienceFilter[1]]
-        ])
-      })
-    }
-  }
-
   swiperMoved(x) {
     if (!map) return
     const mapPanePos = map._getMapPanePos()
     const nw = map.containerPointToLayerPoint([0, 0])
     const se = map.containerPointToLayerPoint(map.getSize())
     const clipX = nw.x + (se.x - nw.x) * x / window.innerWidth
-    glCompareLayers.before._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, clipX+mapPanePos.x, se.y+mapPanePos.y, nw.x+mapPanePos.x].join('px,') + 'px)'
-    glCompareLayers.after._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, se.x+mapPanePos.x, se.y+mapPanePos.y, clipX+mapPanePos.x].join('px,') + 'px)'
+    glCompareLayers.left._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, clipX+mapPanePos.x, se.y+mapPanePos.y, nw.x+mapPanePos.x].join('px,') + 'px)'
+    glCompareLayers.right._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, se.x+mapPanePos.x, se.y+mapPanePos.y, clipX+mapPanePos.x].join('px,') + 'px)'
   }
 
 }
@@ -364,4 +357,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Map)
+)(GapsMap)

@@ -4,7 +4,6 @@ import { createHashHistory } from 'history'
 import polyline from 'polyline'
 
 import {
-  filters as filterOptions,
   overlays as overlayOptions,
   compareTimes as timeOptions
 } from '../settings/options'
@@ -23,16 +22,20 @@ const initialState = {
 
 export default handleActions({
   'set region' (state, action) {
+    var view = state.view
+    if (view === 'default') view = 'show'
     var newState = Object.assign({}, state, {
-      view: state.view === 'default' ? 'show' : state.view,
+      view,
       region: action.payload
     })
     updateURL(newState)
     return newState
   },
   'set region from url' (state, action) {
+    var view = state.view
+    if (view === 'default') view = 'show'
     return Object.assign({}, state, {
-      view: state.view === 'default' ? 'show' : state.view,
+      view,
       region: parseRegionFromUrl(action.payload)
     })
   },
@@ -60,11 +63,7 @@ export default handleActions({
     if (action.payload === undefined) return state
     return Object.assign({}, state, {
       filters: action.payload !== 'none'
-        ? action.payload.split(',').filter(filter =>
-            filterOptions.some(filterOption =>
-              filterOption.id === filter
-            )
-          )
+        ? action.payload.split(',')
         : []
     })
   },
@@ -131,16 +130,33 @@ export default handleActions({
 }, initialState)
 
 function updateURL(state) {
-  const view = state.view === 'country' ? 'show' : state.view
+  var view = state.view
+  switch (view) {
+    case 'gaps-region':
+      view = 'gaps'
+      break
+    case 'country':
+      view = 'show'
+      break
+  }
   const region = state.region
   const filtersPart = state.filters.length > 0
     ? state.filters.sort().join(',')
     : 'none'
   const overlayPart = state.overlay
   const timesPart = state.times.join('...')
-  const options = state.view === 'compare'
-    ? timesPart + '/' + filtersPart
-    : filtersPart + '/' + overlayPart
+  var options
+  switch (view) {
+    case 'compare':
+      options = timesPart + '/' + filtersPart
+      break
+    case 'gaps-region':
+    case 'gaps':
+      options = filtersPart
+      break
+    default:
+      options = filtersPart + '/' + overlayPart
+  }
 
   const embed = state.embed ? '/embed' : ''
   const theme = state.theme ? '/' + state.theme : ''

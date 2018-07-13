@@ -6,7 +6,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as MapActions from '../../actions/map'
 import { compareTimes as timeOptions } from '../../settings/options'
-import { filters } from '../../settings/options'
 import DropdownButton from '../DropdownButton'
 import Button from './button'
 import themes from '../../settings/themes'
@@ -78,16 +77,16 @@ class EmbedHeader extends Component {
         </div>
 
         <div>
-          {filters.filter(filter => filter.hidden !== true).map(filter => {
-            const active = this.props.enabledFilters !== undefined && filter.id === this.props.enabledFilters[0]
+          {this.props.layers.filter(filter => filter.hidden !== true).map(filter => {
+            const active = this.props.enabledFilters !== undefined && filter.name === this.props.enabledFilters[0]
             return <Button
               theme={theme}
               active={active}
-              key={filter.id}
+              key={filter.name}
               className={classnames({ '-selected': active })}
-              onClick={_.partial(this.onFeatureTypeClick, [filter.id]).bind(this)}
+              onClick={_.partial(this.onFeatureTypeClick, [filter.name]).bind(this)}
             >
-              {filter.description}
+              {filter.title}
             </Button>
           })}
         </div>

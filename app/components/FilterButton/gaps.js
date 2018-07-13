@@ -1,13 +1,14 @@
 import React, { Component } from 'react'
 import DropdownButton from '../DropdownButton'
+import { gapsFilters } from '../../settings/options'
 
 
-class FilterButton extends Component {
+class GapsFilterButton extends Component {
   render() {
-    var btn = <button className='filter' title='Select Map Features'>{this.props.layers.find(layer => layer.name === this.props.enabledFilters[0]).title}&ensp;▾</button>
+    var btn = <button className='filter' title='Select Gap Analysis'>{gapsFilters.find(filter => filter.id === this.props.enabledFilters[0]).description}&ensp;▾</button>
     return (
       <DropdownButton
-        options={this.props.layers.map(layer => ({ id: layer.name, description: layer.title }))}
+        options={gapsFilters.filter(f => !f.hidden)}
         btnElement={btn}
         multiple={false}
         selectedKeys={this.props.enabledFilters}
@@ -24,4 +25,4 @@ class FilterButton extends Component {
 }
 
 
-export default FilterButton
+export default GapsFilterButton

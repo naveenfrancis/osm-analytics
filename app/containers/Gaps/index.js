@@ -4,28 +4,23 @@ import { bindActionCreators } from 'redux'
 import * as MapActions from '../../actions/map'
 import Header from '../../components/Header'
 import EmbedHeader from '../../components/Header/embedHeader.js'
-import Map from '../../components/Map'
-import Stats from '../../components/Stats'
-import CompareBar from '../../components/CompareBar'
-import { load as loadHotProjects } from '../../data/hotprojects.js'
-import themes from '../../settings/themes'
+import GapsMap from '../../components/Map/gaps.js'
+import GapsStats from '../../components/Stats/gaps.js'
 import { loadLayers } from '../../settings/options'
-import style from './style.css'
+import themes from '../../settings/themes'
+import style from '../App/style.css'
 
-class App extends Component {
+class Gaps extends Component {
   state = {
-    hotProjectsLoaded: false,
     layersLoaded: false
   }
 
   render() {
     const { actions, routeParams, route, embed } = this.props
     const theme = routeParams.theme || 'default'
-    const header = embed
-      ? <EmbedHeader layers={this.state.layers || []} {...actions} theme={theme}/>
-      : <Header/>
+    const header = (embed) ? <EmbedHeader {...actions} theme={theme}/> : <Header/>
 
-    if (!this.state.hotProjectsLoaded || !this.state.layersLoaded) {
+    if (!this.state.layersLoaded) {
       return (
         <div className="main">
           {header}
@@ -37,18 +32,15 @@ class App extends Component {
     return (
       <div className="main">
         {header}
-        <Map
-          layers={this.state.layers}
+        <GapsMap
           region={routeParams.region}
           filters={routeParams.filters}
-          overlay={routeParams.overlay}
-          times={routeParams.times}
           view={route.view}
+          defaultThreshold="1000"
           embed={embed}
           theme={theme}
         />
-        {route.view === 'country' ? <Stats layers={this.state.layers} mode={routeParams.overlay}/> : ''}
-        {route.view === 'compare' && embed === false ? <CompareBar layers={this.state.layers} times={routeParams.times}/> : ''}
+        {route.view === 'gaps-region' ? <GapsStats layers={this.state.layers} /> : ''}
         { embed ? <a className="external-link" target='_blank' rel='noreferrer noopener' style={themes[theme].externalLink} href='http://osm-analytics.org/'>View on osm-analytics.org</a> : '' }
       </div>
     )
@@ -57,12 +49,6 @@ class App extends Component {
   componentDidMount() {
     this.props.actions.setEmbedFromUrl(this.props.routeParams.embed === 'embed')
     this.props.actions.setThemeFromUrl(this.props.routeParams.theme)
-    loadHotProjects((err) => {
-      if (err) {
-        return console.error('unable to load hot projects data: ', err)
-      }
-      this.setState({ hotProjectsLoaded: true })
-    })
     loadLayers((err, layers) => {
       if (err) {
         return console.error('unable to load available osm-analytics layers: ', err)
@@ -90,4 +76,4 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(App)
+)(Gaps)
