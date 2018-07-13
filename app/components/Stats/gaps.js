@@ -16,15 +16,12 @@ import regionToCoords from '../Map/regionToCoords'
 import searchHotProjectsInRegion from './searchHotProjects'
 import searchFeatures from './searchFeatures'
 import searchBuiltupAreas from './searchBuiltupAreas'
-import { filters } from '../../settings/options'
 import unitSystems from '../../settings/unitSystems'
 import style from './style.css'
 
 class GapsStats extends Component {
   state = {
     features: [],
-    hotProjects: [],
-    hotProjectsModalOpen: false,
     updating: false
   }
 
@@ -37,7 +34,7 @@ class GapsStats extends Component {
         <ul className="metrics">
           <li><p>OSM</p></li>
         {features.map(filter => {
-          return (<li key={filter.filter} title={filters.find(f => f.id === filter.filter).altText}>
+          return (<li key={filter.filter} title={this.props.layers.find(f => f.name === filter.filter).description}>
             <span className="number">{
               numberWithCommas(Number((filter.filter === 'highways' || filter.filter === 'waterways'
                 ? unitSystems[this.props.stats.unitSystem].distance.convert(
@@ -50,10 +47,10 @@ class GapsStats extends Component {
             ? <UnitSelector
                 unitSystem={this.props.stats.unitSystem}
                 unit='distance'
-                suffix={' of '+filters.find(f => f.id === filter.filter).description}
+                suffix={' of '+this.props.layers.find(f => f.name === filter.filter).title}
                 setUnitSystem={this.props.statsActions.setUnitSystem}
               />
-            : <span className="descriptor">{filters.find(f => f.id === filter.filter).description}</span>
+            : <span className="descriptor">{this.props.layers.find(f => f.name === filter.filter).title}</span>
             }
           </li>)
         })}
@@ -108,8 +105,6 @@ class GapsStats extends Component {
           updating: false
         })
       }.bind(this))
-      const hotProjects = searchHotProjectsInRegion(region)
-      this.setState({ hotProjects })
     }).bind(this));
   }
 }

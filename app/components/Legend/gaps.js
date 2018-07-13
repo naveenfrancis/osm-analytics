@@ -13,6 +13,16 @@ class Legend extends Component {
     return (
       <ul id="legend" style={themes[theme].legend}>
         <li><h3>Map Legend</h3></li>
+        <li><span
+          style={{backgroundColor: "green"}}
+          className="legend-icon fill" />
+          likely complete OSM data
+        </li>
+        <li><span
+          style={{backgroundColor: "red"}}
+          className="legend-icon fill" />
+          probable gap in OSM data
+        </li>
       </ul>
     )
   }

@@ -6,13 +6,13 @@ import Header from '../../components/Header'
 import EmbedHeader from '../../components/Header/embedHeader.js'
 import GapsMap from '../../components/Map/gaps.js'
 import GapsStats from '../../components/Stats/gaps.js'
-import { load as loadHotProjects } from '../../data/hotprojects.js'
+import { loadLayers } from '../../settings/options'
 import themes from '../../settings/themes'
 import style from '../App/style.css'
 
 class Gaps extends Component {
   state = {
-    hotProjectsLoaded: false
+    layersLoaded: false
   }
 
   render() {
@@ -20,20 +20,19 @@ class Gaps extends Component {
     const theme = routeParams.theme || 'default'
     const header = (embed) ? <EmbedHeader {...actions} theme={theme}/> : <Header/>
 
-    if (!this.state.hotProjectsLoaded) {
+    if (!this.state.layersLoaded) {
       return (
         <div className="main">
           {header}
+          <p style={{ textAlign: "center", marginTop: "100px" }}>Loading…</p>
         </div>
       )
-      return <p style="text-align:center;">Loading…</p>
     }
 
     return (
       <div className="main">
         {header}
         <GapsMap
-          layers={this.state.layers}
           region={routeParams.region}
           filters={routeParams.filters}
           view={route.view}
@@ -41,7 +40,7 @@ class Gaps extends Component {
           embed={embed}
           theme={theme}
         />
-        {route.view === 'gaps-region' ? <GapsStats /> : ''}
+        {route.view === 'gaps-region' ? <GapsStats layers={this.state.layers} /> : ''}
         { embed ? <a className="external-link" target='_blank' rel='noreferrer noopener' style={themes[theme].externalLink} href='http://osm-analytics.org/'>View on osm-analytics.org</a> : '' }
       </div>
     )
@@ -50,11 +49,14 @@ class Gaps extends Component {
   componentDidMount() {
     this.props.actions.setEmbedFromUrl(this.props.routeParams.embed === 'embed')
     this.props.actions.setThemeFromUrl(this.props.routeParams.theme)
-    loadHotProjects((err) => {
+    loadLayers((err, layers) => {
       if (err) {
-        console.error('unable to load hot projects data: ', err)
+        return console.error('unable to load available osm-analytics layers: ', err)
       }
-      this.setState({ hotProjectsLoaded: true })
+      this.setState({
+        layersLoaded: true,
+        layers
+      })
     })
   }
 }
