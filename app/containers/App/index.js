@@ -21,7 +21,9 @@ class App extends Component {
   render() {
     const { actions, routeParams, route, embed } = this.props
     const theme = routeParams.theme || 'default'
-    const header = (embed) ? <EmbedHeader {...actions} theme={theme}/> : <Header/>
+    const header = embed
+      ? <EmbedHeader layers={this.state.layers || []} {...actions} theme={theme}/>
+      : <Header/>
 
     if (!this.state.hotProjectsLoaded || !this.state.layersLoaded) {
       return (
