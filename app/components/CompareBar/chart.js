@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import vg from 'vega'
 import { debounce } from 'lodash'
 import * as MapActions from '../../actions/map'
-import { filters as filterOptions, compareTimes as timeOptions } from '../../settings/options'
+import { compareTimes as timeOptions } from '../../settings/options'
 
 class Timegraph extends Component {
   state = {
@@ -27,8 +27,8 @@ class Timegraph extends Component {
       })
 
       // initialize graph data
-      filterOptions.forEach(filter => {
-        vis.data(filter.id+'_data').insert([])
+      this.props.layers.forEach(filter => {
+        vis.data(filter.name+'_data').insert([])
       })
       vis.update()
 
@@ -74,8 +74,8 @@ class Timegraph extends Component {
 
     if (vis) {
       // update data in case it changed
-      filterOptions.forEach(filter => {
-        vis.data(filter.id+'_data').remove(() => true).insert(data[filter.id] && data[filter.id].filter(x => x) || [])
+      this.props.layers.forEach(filter => {
+        vis.data(filter.name+'_data').remove(() => true).insert(data[filter.name] && data[filter.name].filter(x => x) || [])
       })
       // update before/after drag markers
       let beforeTimestamp = +timeOptions.find(timeOption => timeOption.id === before).timestamp
@@ -98,7 +98,7 @@ class Timegraph extends Component {
 
 
   _spec(before, after) {
-    const filters = filterOptions.map(filter => filter.id)
+    const filters = this.props.layers.map(filter => filter.name)
     var styleSpec = {
       "width": 1e6,
       "height": 90,

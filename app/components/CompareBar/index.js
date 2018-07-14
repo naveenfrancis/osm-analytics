@@ -5,7 +5,7 @@ import { queue } from 'd3-queue'
 import { polygon } from 'turf'
 import * as MapActions from '../../actions/map'
 import * as StatsActions from '../../actions/stats'
-import { compareTimes as timeOptions, filters as filterOptions } from '../../settings/options'
+import { compareTimes as timeOptions } from '../../settings/options'
 import unitSystems from '../../settings/unitSystems'
 import regionToCoords from '../Map/regionToCoords'
 import searchFeatures from '../Stats/searchFeatures'
@@ -40,17 +40,17 @@ class CompareBar extends Component {
             ? <UnitSelector
                 unitSystem={this.props.stats.unitSystem}
                 unit='distance'
-                suffix={' of '+filterOptions.find(f => f.id === filter).description}
+                suffix={' of '+this.props.layers.find(f => f.name === filter).title}
                 setUnitSystem={this.props.statsActions.setUnitSystem}
               />
-            : <span className="descriptor">{filterOptions.find(f => f.id === filter).description}</span>
+            : <span className="descriptor">{this.props.layers.find(f => f.name === filter).title}</span>
             }
           </li>)
         })}
         </ul>
         <ul className="metrics after">
         {this.props.map.filters.filter(filter => this.state.featureCounts[filter]).map(filter => {
-          return (<li key={filter} title={filterOptions.find(f => f.id === filter).altText}>
+          return (<li key={filter} title={this.props.layers.find(f => f.name === filter).description}>
             <span className="number">{
               numberWithCommas(
                 (filter === 'highways' || filter === 'waterways' ? unitSystems[this.props.stats.unitSystem].distance.convert : x=>x)(
@@ -61,10 +61,10 @@ class CompareBar extends Component {
             ? <UnitSelector
                 unitSystem={this.props.stats.unitSystem}
                 unit='distance'
-                suffix={' of '+filterOptions.find(f => f.id === filter).description}
+                suffix={' of '+this.props.layers.find(f => f.name === filter).title}
                 setUnitSystem={this.props.statsActions.setUnitSystem}
               />
-            : <span className="descriptor">{filterOptions.find(f => f.id === filter).description}</span>
+            : <span className="descriptor">{this.props.layers.find(f => f.name === filter).title}</span>
             }
           </li>)
         })}
@@ -77,7 +77,7 @@ class CompareBar extends Component {
           <button className="compare-toggle" onClick={::this.disableCompareView}>Close Comparison View</button>
         </div>
 
-        <Chart before={this.props.map.times[0]} after={this.props.map.times[1]} data={this.state.featureCounts}/>
+        <Chart layers={this.props.layers} before={this.props.map.times[0]} after={this.props.map.times[1]} data={this.state.featureCounts}/>
       </div>
     )
   }
