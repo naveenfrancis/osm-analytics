@@ -119,9 +119,11 @@ class GapsMap extends Component {
       scrollWheelZoom: !embed
     })
     .setView([2, 26], 4)
-    map.zoomControl.setPosition('bottomright')
     map.on('editable:editing', debounce(::this.setCustomRegion, 200))
     map.on('zoomend', (e) => { this.setState({ mapZoomLevel:map.getZoom() }) })
+
+    L.control.scale({ position: 'bottomright' }).addTo(map)
+    map.zoomControl.setPosition('bottomright')
 
     backgroundLayer = L.tileLayer(settings['map-background-tile-layer'], {
       attribution: settings['map-attribution'],

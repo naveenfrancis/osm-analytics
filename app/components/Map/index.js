@@ -73,9 +73,11 @@ class Map extends Component {
       scrollWheelZoom: !embed
     })
     .setView([0, 35], 2)
-    map.zoomControl.setPosition('bottomright')
     map.on('editable:editing', debounce(::this.setCustomRegion, 200))
     map.on('zoomend', (e) => { this.setState({ mapZoomLevel:map.getZoom() }) })
+
+    L.control.scale({ position: 'bottomright' }).addTo(map)
+    map.zoomControl.setPosition('bottomright')
 
     L.tileLayer(settings['map-background-tile-layer'], {
       attribution: settings['map-attribution'],
