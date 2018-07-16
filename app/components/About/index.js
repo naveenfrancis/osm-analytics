@@ -34,6 +34,10 @@ class About extends Component {
           <p>Want to dig even deeper into the data? The <i>Compare Time Periods</i> feature gives you a side by side comparison down to the individual objects level. Use the swiper to switch between the selected dates.</p>
         </article>
         <article>
+          <h2>Find Gaps in OSM Data</h2>
+          <p>By comparing OpenStreetMap feature densities with certain external data sets potential gaps in OSM can be identified: The <i>Gap Detection</i> tab of osm-analytics shows building counts that are matched with the amount of <a href="https://ghsl.jrc.ec.europa.eu/ghs_bu.php">built-up area</a> (derived using remote sensing methods) to help find areas with potentially missing building data in OSM.</p>
+        </article>
+        <article>
           <h2>What&apos;s more</h2>
           <p><b>Explore data by mapper experience:</b> Alternatively to the mapping activity over time (recency of edits) view, one can also investigate the data from a <i>editor level of experience</i> point of view: The graph then displays how large the proportion of the objects is that have been contributed by beginners, intermediate level mappers or experienced users.</p>
           <p><b>Hot Projects:</b> Know which <a className="link" href="http://tasks.hotosm.org/">projects</a> of the <a className="link" href="hotosm.org">Humanitarian OpenStreetMap Team</a> influenced the development of the mapping of a region.</p>

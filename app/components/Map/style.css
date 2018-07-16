@@ -65,12 +65,18 @@ button.filter {
 }
 
 .countryView,
-.compareView,
-.gaps-regionView {
+.compareView {
   .leaflet-bottom,
   .slider-box,
   #legend {
     margin-bottom: 212px;
+  }
+}
+.gaps-regionView {
+  .leaflet-bottom,
+  .slider-box,
+  #legend {
+    margin-bottom: 74px;
   }
 }
 

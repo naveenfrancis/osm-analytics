@@ -4,7 +4,12 @@ div#stats, div#gaps-stats {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 212px;
+  &#stats {
+    height: 212px;
+  }
+  &#gaps-stats {
+    height: 74px;
+  }
 
   background: rgba(#344762, 0.8);
   background: linear-gradient(to bottom, rgba(#344762,0.8) 0%,rgba(#262323,0.8) 100%);
