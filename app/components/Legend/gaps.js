@@ -9,7 +9,7 @@ class Legend extends Component {
   state = {}
 
   render() {
-    const { showHighlighted, layer, theme }  = this.props
+    const { layer, theme }  = this.props
     return (
       <ul id="legend" style={themes[theme].legend}>
         <li><h3>Map Legend</h3></li>

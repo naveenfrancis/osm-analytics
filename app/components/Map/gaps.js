@@ -96,7 +96,6 @@ class GapsMap extends Component {
         <GapsLegend
           featureType={this.props.map.filters[0]}
           zoom={this.state.mapZoomLevel}
-          showHighlighted={embed === false && !!this.props.stats.timeFilter}
           theme={theme}
         />
         <ThresholdSelector
