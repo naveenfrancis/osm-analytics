@@ -101,9 +101,10 @@
     }
   }
   article:nth-child(4) {
-    background-image: url("../../assets/about-stats.png");
-    background-position: 0 167px;
-    background-repeat: no-repeat;
+    h2, p {
+      width: 800px;
+      padding-left: 0;
+    }
   }
   article:nth-child(5) {
     position: relative;
@@ -115,10 +116,15 @@
       left: 50%;
       height: 300px;
       width: 400px;
-      background-image: url("../../assets/about-gridcells.png");
-      background-position: 40px 0;
+      background-image: url("../../assets/about-stats.png");
+      background-position: 40px 60px;
       background-repeat: no-repeat;
     }
+  }
+  article:nth-child(6) {
+    background-image: url("../../assets/about-gridcells.png");
+    background-position: 0 107px;
+    background-repeat: no-repeat;
   }
 }
 
