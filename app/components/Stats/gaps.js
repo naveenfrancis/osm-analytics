@@ -17,6 +17,7 @@ import searchHotProjectsInRegion from './searchHotProjects'
 import searchFeatures from './searchFeatures'
 import searchBuiltupAreas from './searchBuiltupAreas'
 import unitSystems from '../../settings/unitSystems'
+import { gapsFilters } from '../../settings/options'
 import style from './style.css'
 
 class GapsStats extends Component {
@@ -34,23 +35,25 @@ class GapsStats extends Component {
         <ul className="metrics">
           <li><p>OSM</p></li>
         {features.map(filter => {
-          return (<li key={filter.filter} title={this.props.layers.find(f => f.name === filter.filter).description}>
+          var osmLayerName = gapsFilters.find(f => f.name === filter.filter).layers.osm
+          var osmLayer = this.props.layers.find(f => f.name === osmLayerName)
+          return (<li key={osmLayer.name} title={osmLayer.title}>
             <span className="number">{
-              numberWithCommas(Number((filter.filter === 'highways' || filter.filter === 'waterways'
+              numberWithCommas(Number((osmLayerName === 'highways' || osmLayerName === 'waterways'
                 ? unitSystems[this.props.stats.unitSystem].distance.convert(
                   filter.features.reduce((prev, feature) => prev+(feature.properties._length || 0.0), 0.0)
                 )
                 : filter.features.reduce((prev, feature) => prev+(feature.properties._count || 1), 0))
               ).toFixed(0))
             }</span><br/>
-            {filter.filter === 'highways' || filter.filter === 'waterways'
+            {osmLayerName === 'highways' || osmLayerName === 'waterways'
             ? <UnitSelector
                 unitSystem={this.props.stats.unitSystem}
                 unit='distance'
-                suffix={' of '+this.props.layers.find(f => f.name === filter.filter).title}
+                suffix={' of '+osmLayer.title}
                 setUnitSystem={this.props.statsActions.setUnitSystem}
               />
-            : <span className="descriptor">{this.props.layers.find(f => f.name === filter.filter).title}</span>
+            : <span className="descriptor">{osmLayer.title}</span>
             }
           </li>)
         })}
@@ -89,9 +92,10 @@ class GapsStats extends Component {
     .then((function(region) {
       this.setState({ updating: true, features: [] })
       var q = queue()
-      filters.forEach(filter =>
-        q.defer(searchFeatures, region, filter)
-      )
+      filters.forEach(filter => {
+        const osmLayerName = gapsFilters.find(f => f.name === filter).layers.osm
+        q.defer(searchFeatures, region, osmLayerName)
+      })
       q.defer(searchBuiltupAreas, region)
       q.awaitAll(function(err, data) {
         if (err) throw err

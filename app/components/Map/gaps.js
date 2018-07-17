@@ -26,7 +26,6 @@ var map // Leaflet map object
 var backgroundLayer
 var gapsLayer
 var glLayer // mapbox-gl layer
-var glCompareLayers // mapbox-gl layers for before/after view
 var boundsLayer = null // selected region layer
 var moveDirectly = false
 
@@ -83,7 +82,7 @@ class GapsMap extends Component {
           <SearchBox className="searchbox" selectedRegion={this.props.map.region} {...actions}/>
           <span className="search-alternative">or</span>
           <button className="outline" onClick={::this.setViewportRegion}>Outline Custom Area</button>
-          <GapsFilterButton enabledFilters={[gapsFilters[0].id]} {...actions}/>
+          <GapsFilterButton enabledFilters={this.props.map.filters} {...actions}/>
           <DropdownButton
             options={backgrounds}
             btnElement={btn}
@@ -96,6 +95,7 @@ class GapsMap extends Component {
         <GapsLegend
           featureType={this.props.map.filters[0]}
           zoom={this.state.mapZoomLevel}
+          layer={gapsFilters.find(filter => filter.id === this.props.map.filters[0])}
           theme={theme}
         />
         <ThresholdSelector
@@ -109,7 +109,6 @@ class GapsMap extends Component {
   }
 
   componentDidMount() {
-
     const { theme, embed } = this.props
 
     map = L.map(
@@ -132,40 +131,10 @@ class GapsMap extends Component {
 
     gapsLayer = (new GapsLayer({tileSize: 512, maxNativeZoom: 13})).addTo(map);
 
-    if (!mapboxgl.supported()) {
-      alert('This browser does not support WebGL which is required to run this application. Please check that you are using a supported browser and that WebGL is enabled.')
-    }
-
-    /*const glCompareLayerStyles = getGapsStyles(theme)
-    glCompareLayers = {
-      left: L.mapboxGL({
-        updateInterval: 0,
-        style: glCompareLayerStyles.osm,
-        hash: false
-      }),
-      right: L.mapboxGL({
-        updateInterval: 0,
-        style: glCompareLayerStyles.reference,
-        hash: false
-      })
-    }
-
-    // add glLayers if map state is already initialized
-    glCompareLayers.left//.addTo(map)
-    glCompareLayers.right//.addTo(map)
-    //this.swiperMoved(window.innerWidth/2)
-    */
-
     // init from route params
-    if (this.props.view) {
-      this.props.actions.setViewFromUrl(this.props.view)
-    }
     if (this.props.region) {
-      this.props.actions.setRegionFromUrl(this.props.region)
       moveDirectly = true
-    }
-    if (this.props.filters) {
-      this.props.actions.setFiltersFromUrl(this.props.filters)
+      this.mapSetRegion(this.props.map.region, this.props.embed === false, this.props.embed === false)
     }
   }
 
@@ -196,45 +165,7 @@ class GapsMap extends Component {
       this.mapSetRegion(nextProps.map.region, nextProps.embed === false, nextProps.embed === false)
     }
     if (nextProps.map.filters.join() !== this.props.map.filters.join()) { // todo: handle this in reducer?
-      glLayer.setStyle(glStyles(nextProps.map.filters, {
-        timeFilter: nextProps.stats.timeFilter,
-        experienceFilter: nextProps.stats.experienceFilter,
-        theme
-      }))
-      let glCompareLayerStyles = getCompareStyles(nextProps.map.filters, nextProps.map.times, theme)
-      glCompareLayers.before.setStyle(glCompareLayerStyles.before)
-      glCompareLayers.after.setStyle(glCompareLayerStyles.after)
-    }
-    if (nextProps.map.times !== this.props.map.times) {
-      let glCompareLayerStyles = getCompareStyles(nextProps.map.filters, nextProps.map.times, theme)
-      if (nextProps.map.times[0] !== this.props.map.times[0]) {
-        glCompareLayers.before.setStyle(glCompareLayerStyles.before)
-      }
-      if (nextProps.map.times[1] !== this.props.map.times[1]) {
-        glCompareLayers.after.setStyle(glCompareLayerStyles.after)
-      }
-    }
-    // check for changed time/experience filter
-    if (nextProps.stats.timeFilter !== this.props.stats.timeFilter) {
-      this.setTimeFilter(nextProps.stats.timeFilter)
-    }
-    if (nextProps.stats.experienceFilter !== this.props.stats.experienceFilter) {
-      this.setExperienceFilter(nextProps.stats.experienceFilter)
-    }
-    // check for switched map views (country/compare)
-    if (nextProps.map.view !== this.props.map.view) {
-      if (!(this.props.map.view === 'country' || this.props.map.view === 'default')
-        && (nextProps.map.view === 'country' || nextProps.map.view === 'default')) {
-        glCompareLayers.before.removeFrom(map)
-        glCompareLayers.after.removeFrom(map)
-        glLayer.addTo(map)
-      }
-      if (nextProps.map.view === 'compare') {
-        glLayer.removeFrom(map)
-        glCompareLayers.before.addTo(map)
-        glCompareLayers.after.addTo(map)
-        this.swiperMoved(window.innerWidth/2)
-      }
+      // todo: rerender
     }
   }
 
@@ -326,16 +257,6 @@ class GapsMap extends Component {
         })
       } catch(e) {}
     });
-  }
-
-  swiperMoved(x) {
-    if (!map) return
-    const mapPanePos = map._getMapPanePos()
-    const nw = map.containerPointToLayerPoint([0, 0])
-    const se = map.containerPointToLayerPoint(map.getSize())
-    const clipX = nw.x + (se.x - nw.x) * x / window.innerWidth
-    glCompareLayers.left._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, clipX+mapPanePos.x, se.y+mapPanePos.y, nw.x+mapPanePos.x].join('px,') + 'px)'
-    glCompareLayers.right._glContainer.style.clip = 'rect(' + [nw.y+mapPanePos.y, se.x+mapPanePos.x, se.y+mapPanePos.y, clipX+mapPanePos.x].join('px,') + 'px)'
   }
 
 }

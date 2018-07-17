@@ -12,9 +12,9 @@ export function loadLayers(callback) {
 
 export const gapsFilters = [
   {
-    id: 'buildings-vs-pop',
-    description: 'Buildings 🡘 Built-up',
-    altText: 'Compare OpenStreetMap buildings to population data from GHS remote sensing data',
+    name: 'buildings-vs-ghs',
+    title: 'Buildings vs. Built-up',
+    description: 'Compare OpenStreetMap buildings to data of built-up areas from "Global Human Settlement Layer"',
     layers: {
       osm: 'buildings',
       reference: 'ghs-pop'

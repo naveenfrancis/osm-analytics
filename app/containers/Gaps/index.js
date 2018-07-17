@@ -29,6 +29,17 @@ class Gaps extends Component {
       )
     }
 
+    // update from route params
+    if (route.view) {
+      this.props.actions.setViewFromUrl(route.view)
+    }
+    if (routeParams.region) {
+      this.props.actions.setRegionFromUrl(routeParams.region)
+    }
+    if (routeParams.filters) {
+      this.props.actions.setFiltersFromUrl(routeParams.filters)
+    }
+
     return (
       <div className="main">
         {header}

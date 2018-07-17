@@ -5,10 +5,10 @@ import { gapsFilters } from '../../settings/options'
 
 class GapsFilterButton extends Component {
   render() {
-    var btn = <button className='filter' title='Select Gap Analysis'>{gapsFilters.find(filter => filter.id === this.props.enabledFilters[0]).description}&ensp;▾</button>
+    var btn = <button className='filter' title='Select Gap Analysis'>{gapsFilters.find(filter => filter.name === this.props.enabledFilters[0]).title}&ensp;▾</button>
     return (
       <DropdownButton
-        options={gapsFilters.filter(f => !f.hidden)}
+        options={gapsFilters.map(layer => ({ id: layer.name, description: layer.title }))}
         btnElement={btn}
         multiple={false}
         selectedKeys={this.props.enabledFilters}

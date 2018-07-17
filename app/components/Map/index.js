@@ -116,21 +116,9 @@ class Map extends Component {
     }
 
     // init from route params
-    if (this.props.view) {
-      this.props.actions.setViewFromUrl(this.props.view)
-    }
     if (this.props.region) {
-      this.props.actions.setRegionFromUrl(this.props.region)
       moveDirectly = true
-    }
-    if (this.props.filters) {
-      this.props.actions.setFiltersFromUrl(this.props.filters)
-    }
-    if (this.props.overlay) {
-      this.props.actions.setOverlayFromUrl(this.props.overlay)
-    }
-    if (this.props.times) {
-      this.props.actions.setTimesFromUrl(this.props.times)
+      this.mapSetRegion(this.props.map.region, this.props.embed === false, this.props.embed === false)
     }
   }
 

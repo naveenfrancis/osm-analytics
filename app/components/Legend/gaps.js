@@ -23,6 +23,9 @@ class Legend extends Component {
           className="legend-icon fill" />
           probable gap in OSM data
         </li>
+        <li>
+          <p>{layer && layer.altText}</p>
+        </li>
       </ul>
     )
   }

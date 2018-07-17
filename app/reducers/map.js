@@ -84,14 +84,20 @@ export default handleActions({
 
   'set view' (state, action) {
     var newState = Object.assign({}, state, {
-      view: action.payload
+      view: action.payload,
+      filters: defaultFilters(action.payload) != defaultFilters(state.view)
+        ? defaultFilters(action.payload)
+        : state.filters
     })
     updateURL(newState)
     return newState
   },
   'set view from url' (state, action) {
     return Object.assign({}, state, {
-      view: action.payload
+      view: action.payload,
+      filters: defaultFilters(action.payload) != defaultFilters(state.view)
+        ? defaultFilters(action.payload)
+        : state.filters
     })
   },
 
@@ -220,5 +226,18 @@ function parseRegionFromUrl(regionString) {
     break
     default:
       throw new Error('unknown region type when parsing from URL', regionString)
+  }
+}
+
+function defaultFilters(view) {
+  switch (view) {
+    case 'default':
+    case 'country':
+    case 'compare':
+    default:
+      return defaults.filters
+    case 'gaps':
+    case 'gaps-region':
+      return defaults.gapsFilters
   }
 }

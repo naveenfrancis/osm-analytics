@@ -34,6 +34,23 @@ class App extends Component {
       )
     }
 
+    // update from route params
+    if (route.view) {
+      this.props.actions.setViewFromUrl(route.view)
+    }
+    if (routeParams.region) {
+      this.props.actions.setRegionFromUrl(routeParams.region)
+    }
+    if (routeParams.filters) {
+      this.props.actions.setFiltersFromUrl(routeParams.filters)
+    }
+    if (routeParams.overlay) {
+      this.props.actions.setOverlayFromUrl(routeParams.overlay)
+    }
+    if (routeParams.times) {
+      this.props.actions.setTimesFromUrl(routeParams.times)
+    }
+
     return (
       <div className="main">
         {header}
