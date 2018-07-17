@@ -14,7 +14,7 @@ export const gapsFilters = [
   {
     name: 'buildings-vs-ghs',
     title: 'Buildings vs. Built-up',
-    description: 'Compare OpenStreetMap buildings to data of built-up areas from "Global Human Settlement Layer"',
+    description: 'OpenStreetMap buildings compared to data of built-up areas from "Global Human Settlement Layer".',
     layers: {
       osm: 'buildings',
       reference: 'ghs-pop'

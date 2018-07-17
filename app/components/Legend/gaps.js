@@ -4,15 +4,20 @@ import moment from 'moment'
 import style from './style.css'
 import settings from '../../settings/settings'
 import themes from '../../settings/themes'
+import { gapsFilters } from '../../settings/options'
 
 class Legend extends Component {
   state = {}
 
   render() {
-    const { layer, theme }  = this.props
+    const { featureType, theme }  = this.props
+    const layer = gapsFilters.find(filter => filter.name === featureType)
     return (
       <ul id="legend" style={themes[theme].legend}>
         <li><h3>Map Legend</h3></li>
+        <li>
+          <p>{layer && layer.description}</p>
+        </li>
         <li><span
           style={{backgroundColor: "green"}}
           className="legend-icon fill" />
@@ -22,9 +27,6 @@ class Legend extends Component {
           style={{backgroundColor: "red"}}
           className="legend-icon fill" />
           probable gap in OSM data
-        </li>
-        <li>
-          <p>{layer && layer.altText}</p>
         </li>
       </ul>
     )
