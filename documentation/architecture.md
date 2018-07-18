@@ -139,7 +139,7 @@ Recent development is going to introduce a few improvements to the OSM-Analytics
 
 ### Gap Analysis
 
-This will introduce a new analyis tab to OSM-Analytics called *gap analysis*. There, different OSM-Analytics feature layers are directly compared to some external reference data set.
+This will introduce a new analysis tab to OSM-Analytics called *gap analysis*. There, different OSM-Analytics feature layers are directly compared to some external reference data set.
 
 In order to make this comparison possible, the given external reference data set will be converted into a vector tile schema very similar to the structure of the OSM-Analytics feature layers (i.e. aggregated into the same bin structure). After this is done, the concrete comparison of the OSM feature layer with the reference data can be accomplished in the client directly.
 
