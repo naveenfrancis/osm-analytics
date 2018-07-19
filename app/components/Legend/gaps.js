@@ -5,6 +5,7 @@ import style from './style.css'
 import settings from '../../settings/settings'
 import themes from '../../settings/themes'
 import { gapsFilters } from '../../settings/options'
+import { colorScheme } from '../Map/gapsLayer'
 
 class Legend extends Component {
   state = {}
@@ -19,12 +20,12 @@ class Legend extends Component {
           <p>{layer && layer.description}</p>
         </li>
         <li><span
-          style={{backgroundColor: "green"}}
+          style={{backgroundColor: colorScheme[colorScheme.length-1]}}
           className="legend-icon fill" />
           likely complete OSM data
         </li>
         <li><span
-          style={{backgroundColor: "red"}}
+          style={{backgroundColor: colorScheme[0]}}
           className="legend-icon fill" />
           probable gap in OSM data
         </li>

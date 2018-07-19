@@ -3,10 +3,14 @@ import Sphericalmercator from 'sphericalmercator'
 import { bboxPolygon, intersect, inside, centroid } from 'turf'
 import loadTile from './loadVectorTile.js'
 import settings from '../../settings/settings'
+import colorbrewer from 'colorbrewer'
 
 const merc = new Sphericalmercator({size: 512})
 const gapsCoverageExtent = bboxPolygon([-17,-20,66,29])
 
+const colorScheme = colorbrewer.PRGn[7]
+
+export { colorScheme }
 export default L.GridLayer.extend({
   threshold: 1000, // ~1000m² per building
 
@@ -57,35 +61,26 @@ export default L.GridLayer.extend({
         var color
         switch (true) {
           case ratio > 15:
-            ctx.fillStyle = "rgba(215,48,39, "+opacity+")"
-            break;
+            ctx.fillStyle = hexToRgbA(colorScheme[0], opacity)
+            break
           case ratio > 5:
-            ctx.fillStyle = "rgba(252,141,89, "+opacity+")"
-            break;
+            ctx.fillStyle = hexToRgbA(colorScheme[1], opacity)
+            break
           case ratio > 2:
-            ctx.fillStyle = "rgba(254,224,139, "+opacity+")"
-            break;
+            ctx.fillStyle = hexToRgbA(colorScheme[2], opacity)
+            break
           case ratio > 1.25:
-            ctx.fillStyle = "rgba(255,255,191, "+opacity+")"
-            break;
+            ctx.fillStyle = hexToRgbA(colorScheme[3], opacity)
+            break
           case ratio > 1:
-            ctx.fillStyle = "rgba(217,239,139, "+opacity+")"
-            break;
+            ctx.fillStyle = hexToRgbA(colorScheme[4], opacity)
+            break
           case ratio > 0.8:
-            ctx.fillStyle = "rgba(145,207,96, "+opacity+")"
-            break;
+            ctx.fillStyle = hexToRgbA(colorScheme[5], opacity)
+            break
           case ratio >= 0:
-            ctx.fillStyle = "rgba(26,152,80, "+opacity+")"
-            break;
-          /*case ratio > 0.1:
-            ctx.fillStyle = "rgba(26,152,80, "+opacity+")"
-            break;
-          case ratio > 0:
-            ctx.fillStyle = "#770077"
-            break;
-          case ratio == 0:
-            ctx.fillStyle = "#ff0077"
-            break;*/
+            ctx.fillStyle = hexToRgbA(colorScheme[6], opacity)
+            break
           default:
             ctx.fillStyle = "#000000"
         }
@@ -97,3 +92,17 @@ export default L.GridLayer.extend({
     return tile
   }
 })
+
+// from https://stackoverflow.com/a/21648508/1627467
+function hexToRgbA (hex, opacity) {
+  var c
+  if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+    c = hex.substring(1).split('')
+    if (c.length == 3) {
+      c = [c[0], c[0], c[1], c[1], c[2], c[2]]
+    }
+    c = '0x' + c.join('')
+    return 'rgba(' + [(c>>16)&255, (c>>8)&255, c&255].join(',') + ',' + (opacity || 1) + ')';
+  }
+  throw new Error('Bad Hex');
+}
