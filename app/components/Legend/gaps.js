@@ -43,7 +43,8 @@ class Legend extends Component {
   }
 
   updateLastModified(featureType) {
-    request.head(settings['vt-source']+'/'+featureType+'/0/0/0.pbf').end((err, res) => {
+    const layer = gapsFilters.find(filter => filter.name === featureType)
+    request.head(settings['vt-source']+'/'+layer.layers.osm+'/0/0/0.pbf').end((err, res) => {
       if (!err) this.setState({
         lastModified: res.headers['last-modified']
       })
