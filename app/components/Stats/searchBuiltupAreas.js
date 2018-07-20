@@ -33,7 +33,7 @@ function fetch(region, callback) {
 
 function getAndCacheTile(tile, callback) {
   const cachePage = 'builtup'
-  loadTile('http://129.206.7.145/gaps/{z}/{x}/{y}.pbf', 'buildup', tile, function(err, data) {
+  loadTile(settings['vt-gaps-source']+'/{z}/{x}/{y}.pbf', 'buildup', tile, function(err, data) {
     if (err) return callback(err)
     // convert features to centroids, store tile data in cache
     data.features = data.features.map(feature => {

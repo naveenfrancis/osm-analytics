@@ -31,7 +31,7 @@ export default L.GridLayer.extend({
 
     var q = queue()
     var tileCoords = { x: coords.x, y: coords.y, z: coords.z-1 }
-    q.defer(loadTile, 'http://129.206.7.145/gaps/{z}/{x}/{y}.pbf', 'buildup', tileCoords)
+    q.defer(loadTile, settings['vt-gaps-source']+'/{z}/{x}/{y}.pbf', 'buildup', tileCoords)
     q.defer(loadTile, settings['vt-source']+'/buildings/{z}/{x}/{y}.pbf', 'osm', tileCoords)
     q.awaitAll((err, data) => {
       if (err) return done(err)
