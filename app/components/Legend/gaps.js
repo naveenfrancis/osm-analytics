@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Link } from 'react-router'
 import * as request from 'superagent'
 import moment from 'moment'
 import style from './style.css'
@@ -17,7 +18,7 @@ class Legend extends Component {
       <ul id="legend" style={themes[theme].legend}>
         <li><h3>Map Legend</h3></li>
         <li>
-          <p>{layer && layer.description}</p>
+          <p>{layer && layer.description} <Link to="/about">Read more.</Link></p>
         </li>
         <li><span
           style={{backgroundColor: colorScheme[colorScheme.length-1]}}

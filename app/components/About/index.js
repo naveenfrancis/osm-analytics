@@ -33,9 +33,10 @@ class About extends Component {
           <h2>Compare OSM Data at Different Points in Time</h2>
           <p>Want to dig even deeper into the data? The <i>Compare Time Periods</i> feature gives you a side by side comparison down to the individual objects level. Use the swiper to switch between the selected dates.</p>
         </article>
-        <article>
+        <article name="gaps">
           <h2>Find Gaps in OSM Data</h2>
-          <p>By comparing OpenStreetMap feature densities with certain external data sets potential gaps in OSM can be identified: The <i>Gap Detection</i> tab of osm-analytics shows building counts that are matched with the amount of <a href="https://ghsl.jrc.ec.europa.eu/ghs_bu.php">built-up area</a> (derived using remote sensing methods) to help find areas with potentially missing building data in OSM.</p>
+          <p>By comparing OpenStreetMap feature densities with certain external data sets potential gaps in OSM can be identified: The <i>Gap Detection</i> tab of osm-analytics shows building counts that are matched with the amount of <a className="link" href="https://ghsl.jrc.ec.europa.eu/ghs_bu.php">built-up area</a> (derived using remote sensing methods) to help find areas with potentially missing building data in OSM.</p>
+          <p></p>
         </article>
         <article>
           <h2>What&apos;s more</h2>

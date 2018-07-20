@@ -21,7 +21,7 @@
       line-height: 22px;
       margin-bottom: 6px;
     }
-    h3, span {
+    h3, span, a, p {
       pointer-events: all;
     }
     p {
