@@ -3,6 +3,7 @@ import Sphericalmercator from 'sphericalmercator'
 import { queue } from 'd3-queue'
 import loadTile from '../Map/loadVectorTile.js'
 import { getRegionZoom, getRegionTiles } from './searchFeatures.js'
+import settings from '../../settings/settings'
 
 var merc = new Sphericalmercator({size: 512})
 
