@@ -103,6 +103,7 @@ class GapsMap extends Component {
           max="50000"
           defaultThreshold="10000"
           thresholdChanged={::this.setThreshold}
+          theme={theme}
         />
       </div>
     )

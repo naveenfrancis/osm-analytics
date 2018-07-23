@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import themes from '../../settings/themes'
 import style from './style.css'
 
 class ThresholdSelector extends Component {
@@ -7,8 +8,9 @@ class ThresholdSelector extends Component {
   }
 
   render() {
+    const { theme }  = this.props
     return (
-      <div className="slider-box">
+      <div className="slider-box" style={themes[theme].legend}>
         <h3>Choose sensitivity</h3>
         <span>high</span> <input
           type="range"

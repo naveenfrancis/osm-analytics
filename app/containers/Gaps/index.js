@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as MapActions from '../../actions/map'
 import Header from '../../components/Header'
-import EmbedHeader from '../../components/Header/embedHeader.js'
 import GapsMap from '../../components/Map/gaps.js'
 import GapsStats from '../../components/Stats/gaps.js'
 import { loadLayers } from '../../settings/options'
@@ -18,7 +17,7 @@ class Gaps extends Component {
   render() {
     const { actions, routeParams, route, embed } = this.props
     const theme = routeParams.theme || 'default'
-    const header = (embed) ? <EmbedHeader {...actions} theme={theme}/> : <Header/>
+    const header = (embed) ? "" : <Header/>
 
     if (!this.state.layersLoaded) {
       return (
@@ -51,7 +50,7 @@ class Gaps extends Component {
           embed={embed}
           theme={theme}
         />
-        {route.view === 'gaps-region' ? <GapsStats layers={this.state.layers} /> : ''}
+        {route.view === 'gaps-region' && embed === false ? <GapsStats layers={this.state.layers} /> : ''}
         { embed ? <a className="external-link" target='_blank' rel='noreferrer noopener' style={themes[theme].externalLink} href='http://osm-analytics.org/'>View on osm-analytics.org</a> : '' }
       </div>
     )

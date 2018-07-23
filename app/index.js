@@ -23,7 +23,7 @@ var routes = (
     </Route>
     <Route path='/gaps'>
       <IndexRoute name='gap detection map' view='gaps' component={Gaps}/>
-      <Route name='gap detection region' path='/gaps/:region/:filters' view='gaps-region' component={Gaps}/>
+      <Route name='gap detection region' path='/gaps/:region/:filters(/:embed(/:theme))' view='gaps-region' component={Gaps}/>
     </Route>
   </Route>
 )
