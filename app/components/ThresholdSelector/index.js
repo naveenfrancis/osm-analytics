@@ -10,7 +10,7 @@ class ThresholdSelector extends Component {
   render() {
     const { theme }  = this.props
     return (
-      <div className="slider-box" style={themes[theme].legend}>
+      <div className="slider-box" style={themes[theme].thresholdSelector}>
         <h3>Choose sensitivity</h3>
         <span>high</span> <input
           type="range"

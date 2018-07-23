@@ -18,6 +18,9 @@ export default {
   legend: {
     bottom: '50px'
   },
+  thresholdSelector: {
+    display: 'none'
+  },
   embedHeader: {
     padding: '10px 0',
     boxShadow: 'none'

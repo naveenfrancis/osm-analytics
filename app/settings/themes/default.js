@@ -1,5 +1,10 @@
 export default {
-  legend: {},
+  legend: {
+    bottom: '50px'
+  },
+  thresholdSelector: {
+    bottom: '50px'
+  },
   embedHeader: {
     boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.5)'
   },
