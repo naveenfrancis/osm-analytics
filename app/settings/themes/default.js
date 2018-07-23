@@ -1,4 +1,10 @@
 export default {
+  externalLink: {
+    position: 'absolute',
+    bottom: '5px',
+    right: '1rem',
+    fontSize: '0.8rem'
+  },
   legend: {
     bottom: '50px'
   },
