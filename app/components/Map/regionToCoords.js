@@ -2,13 +2,14 @@ import { bboxPolygon, polygon, flip, simplify } from 'turf'
 import * as request from 'superagent'
 import superagentPromisePlugin from 'superagent-promise-plugin'
 import 'promise'
+import settings from '../../settings/settings'
 
 export default function regionToCoords(region, latLngOrder) {
   var coords
   if (region.type === 'hot') {
     let projectId = region.id
     coords = request
-    .get('https://tasks.hotosm.org/api/v1/project/'+projectId+'/aoi')
+    .get(settings['tm-api'] + '/project/'+projectId+'/aoi')
     .use(superagentPromisePlugin)
     .then(function(res) {
       let geometry = res.body

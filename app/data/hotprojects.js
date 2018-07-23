@@ -1,4 +1,5 @@
 import * as request from 'superagent'
+import settings from '../settings/settings'
 
 var hotprojects = null
 
@@ -16,7 +17,7 @@ export function load(callback) {
   }
 
   request
-  .get('https://tasks.hotosm.org/api/v1/project/search')
+  .get(settings['tm-api'] + '/project/search')
   .end(function(err, res) {
     if (err) return callback(err)
     hotprojects = res.body.mapResults
