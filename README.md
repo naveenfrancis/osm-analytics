@@ -84,7 +84,7 @@ $ npm run build
 Embedding
 ---------
 
-This user interface supports a custom UI for embedding on 3rd party websites, using an HTML `iframe`. It allows generating a 
+This user interface supports a custom UI for embedding on 3rd party websites, using an HTML `iframe`. It allows generating a
 time comparison between two points in time for the same region.
 
 ![Comparison map](https://github.com/GFDRR/osm-analytics/blob/master/documentation/embed-example-1.png?raw=true "Comparison map")
@@ -92,16 +92,21 @@ time comparison between two points in time for the same region.
 
 The above visualization can be generated using a specific URL structure:
 
-`<iframe_base_url>/#/compare/polygon:<polygon>/<default_start_year>...<default_end_year>/<default_feature_type>/embed/<theme_name>`
+`https://osm-analytics.org/#/compare/<region>/<default_start_year>...<default_end_year>/<default_feature_type>/embed/<theme_name>`
 
 - __iframe_base_url__ (`http://osm-analytics.org`)
-- __polygon__ an encoded polyline of the area of interest related to the project (ie `ifv%7BDndwkBx%60%40aYwQev%40sHkPuf%40ss%40%7BfA_%40uq%40xdCn%7D%40%5E`))
+- __region__ the area of interest the embedded map is shown for. Can be a bounding box (`bbox:110.28050,-7.02687,110.48513,-6.94219`), an [encoded polyline](https://www.npmjs.com/package/@mapbox/polyline) of a polygon (e.g. `polygon:ifv%7BDndwkBx%60%40aYwQev%40sHkPuf%40ss%40%7BfA_%40uq%40xdCn%7D%40%5E`)), or a hot project id (e.g. `hot:4053`)
 - __default_start_year__ (`2016`) represents the start year of an OpenDRI project
 - __default_end_year__ (`now`) represents the end year of an OpenDRI project. `now` can also be provided to compare with latest OSM data
-- __default_feature_type__ (`buildings`) compare `buildings`, `highways` or `waterways` 
-- __theme_name__ (`default`) use the `default` OSM Analytics visual style, or the `opendri` theme 
+- __default_feature_type__ (`buildings`) compare `buildings`, `highways` or `waterways`
+- __theme_name__ (`default`) use the `default` OSM Analytics visual style, or the `opendri` theme
 
-see also
+The *gap detection* view can also be used as an embedded map in a very similar way:
+
+`https://osm-analytics.org/#/gaps/<region>/buildings-vs-ghs/embed/<theme_name>`
+
+
+See Also
 --------
 
 * [lukasmartinelli/osm-activity](https://github.com/lukasmartinelli/osm-activity) – similar to OSM-Analytics, but with a simpler, more basic user interface
