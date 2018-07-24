@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as MapActions from '../../actions/map'
+import * as StatsActions from '../../actions/stats'
 import Header from '../../components/Header'
 import EmbedHeader from '../../components/Header/embedHeader.js'
 import Map from '../../components/Map'
@@ -19,7 +20,7 @@ class App extends Component {
   }
 
   render() {
-    const { actions, routeParams, route, embed } = this.props
+    const { actions, routeParams, route, location, embed } = this.props
     const theme = routeParams.theme || 'default'
     var header = ""
     if (embed && this.props.view === "compare")
@@ -51,6 +52,21 @@ class App extends Component {
     }
     if (routeParams.times) {
       this.props.actions.setTimesFromUrl(routeParams.times)
+    }
+
+    if (location.query.experienceSelection) {
+      //setTimeout(() => {
+        this.props.statsActions.setExperienceFilter(
+          location.query.experienceSelection.split(",").map(Number)
+        )
+      //}, 10)
+    }
+    if (location.query.timeSelection) {
+      //setTimeout(() => {
+        this.props.statsActions.setTimeFilter(
+          location.query.timeSelection.split(",").map(Number)
+        )
+      //}, 10)
     }
 
     return (
@@ -102,7 +118,8 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    actions: bindActionCreators(MapActions, dispatch)
+    actions: bindActionCreators(MapActions, dispatch),
+    statsActions: bindActionCreators(StatsActions, dispatch)
   }
 }
 

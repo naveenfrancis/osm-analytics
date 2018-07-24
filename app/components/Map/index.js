@@ -54,7 +54,7 @@ class Map extends Component {
         <Legend
           layer={activeLayer}
           zoom={this.state.mapZoomLevel}
-          showHighlighted={embed === false && (!!this.props.stats.timeFilter || !!this.props.stats.experienceFilter)}
+          showHighlighted={!!this.props.stats.timeFilter || !!this.props.stats.experienceFilter}
           theme={theme}
         />
       </div>
@@ -119,6 +119,12 @@ class Map extends Component {
     if (this.props.region) {
       moveDirectly = true
       this.mapSetRegion(this.props.map.region, this.props.embed === false, this.props.embed === false)
+    }
+
+    if (this.props.stats.timeFilter) {
+      glLayer._glMap.on('load', () =>
+        this.setTimeFilter(this.props.stats.timeFilter)
+      )
     }
   }
 

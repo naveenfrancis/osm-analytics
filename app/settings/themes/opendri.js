@@ -1,4 +1,5 @@
 const blue = '#8DCCFD'
+const orange = '#FFBA8A'
 const UIBlue = '#1477c9'
 
 const baseButton = {
@@ -74,14 +75,14 @@ export default {
         "fill-outline-color": blue
       },
       "raw-highlight": {
-        "fill-color": blue,
-        "fill-outline-color": blue
+        "fill-color": orange,
+        "fill-outline-color": orange
       },
       "aggregated": {
         "fill-color": blue
       },
       "aggregated-highlight": {
-        "fill-color": blue
+        "fill-color": orange
       }
     },
     highways: {
