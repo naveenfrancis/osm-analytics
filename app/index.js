@@ -18,7 +18,7 @@ var routes = (
     <Route name='landing page' path='/about' component={AboutPage}/>
     <Route path='/'>
       <IndexRoute name='default view' view='default' component={App}/>
-      <Route name='country view' path='show/:region(/:filters(/:overlay))' view='country' component={App}/>
+      <Route name='country view' path='show/:region(/:filters(/:overlay(/:embed(/:theme))))' view='country' component={App}/>
       <Route name='compare view' path='compare/:region(/:times(/:filters(/:embed(/:theme))))' view='compare' component={App}/>
     </Route>
     <Route path='/gaps'>

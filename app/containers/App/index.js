@@ -21,9 +21,11 @@ class App extends Component {
   render() {
     const { actions, routeParams, route, embed } = this.props
     const theme = routeParams.theme || 'default'
-    const header = embed
-      ? <EmbedHeader layers={this.state.layers || []} {...actions} theme={theme}/>
-      : <Header/>
+    var header = ""
+    if (embed && this.props.view === "compare")
+      header = <EmbedHeader layers={this.state.layers || []} {...actions} theme={theme}/>
+    else if (!embed)
+      header = <Header/>
 
     if (!this.state.hotProjectsLoaded || !this.state.layersLoaded) {
       return (
@@ -64,7 +66,7 @@ class App extends Component {
           embed={embed}
           theme={theme}
         />
-        {route.view === 'country' ? <Stats layers={this.state.layers} mode={routeParams.overlay}/> : ''}
+        {route.view === 'country' && embed === false ? <Stats layers={this.state.layers} mode={routeParams.overlay}/> : ''}
         {route.view === 'compare' && embed === false ? <CompareBar layers={this.state.layers} times={routeParams.times}/> : ''}
         { embed ? <a className="external-link" target='_blank' rel='noreferrer noopener' style={themes[theme].externalLink} href='http://osm-analytics.org/'>View on osm-analytics.org</a> : '' }
       </div>
