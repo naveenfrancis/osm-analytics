@@ -55,18 +55,14 @@ class App extends Component {
     }
 
     if (location.query.experienceSelection) {
-      //setTimeout(() => {
-        this.props.statsActions.setExperienceFilter(
-          location.query.experienceSelection.split(",").map(Number)
-        )
-      //}, 10)
+      this.props.statsActions.setExperienceFilter(
+        location.query.experienceSelection.split(",").map(Number)
+      )
     }
     if (location.query.timeSelection) {
-      //setTimeout(() => {
-        this.props.statsActions.setTimeFilter(
-          location.query.timeSelection.split(",").map(Number)
-        )
-      //}, 10)
+      this.props.statsActions.setTimeFilter(
+        location.query.timeSelection.split(",").map(Number)
+      )
     }
 
     return (
